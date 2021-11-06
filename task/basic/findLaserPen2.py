@@ -9,7 +9,7 @@ file_test = r"http://169.254.121.50:8080/?action=stream"
 cap = cv2.VideoCapture(file_test)
 
 cut_x_offset = 400
-cut_y_offset = 300
+cut_y_offset = 200
 #region 模块化算法
 def showimg(img):
     plt.imshow(img, "gray")
@@ -50,7 +50,7 @@ while True:
 
     # cv2.imshow("source", frame)
     frame_cut=frame[cut_y_offset:550,cut_x_offset:850]
-    # cv2.imshow("cut", frame)
+    cv2.imshow("cut", frame_cut)
     img=cv2.cvtColor(frame_cut,cv2.COLOR_BGR2GRAY)
 
     if isFirstShow:
