@@ -32,9 +32,8 @@ def drawCenterPoint(img,imgName):
 
 
 def drawCont(thimg):
-    tempimg = thimg.copy()
-    contours = findRealCont(tempimg)
-    img_rgb = cv2.cvtColor(tempimg, cv2.COLOR_GRAY2BGR)
+    contours = findRealCont(thimg)
+    tempimg = cv2.cvtColor(thimg, cv2.COLOR_GRAY2BGR)
     for point in contours:
         cv2.circle(tempimg, point, 1, (0, 0, 255))
     cv2.imshow("Cont", tempimg)
@@ -61,8 +60,6 @@ LastTime = startTime
 # endregion
 Lresult = 0
 
-# 首先要看看应该用哪个
-frameCounter=0
 
 # l_XMIN = float("inf")
 # l_XMAX = -l_XMIN
@@ -83,19 +80,11 @@ while True:
     # region 取帧
     ret, frame_l = cap_l.read()
     ret, frame_r = cap_r.read()
-    frameCounter = frameCounter + 1
 
     thimg_l = imgRoundDect(cv2.cvtColor(frame_l, cv2.COLOR_BGR2GRAY))  # 二值化
     thimg_r = imgRoundDect(cv2.cvtColor(frame_r, cv2.COLOR_BGR2GRAY))  # 二值化
     X_l, Y = drawCenterPoint(thimg_l,"thimg_l")
     X_r, Y = drawCenterPoint(thimg_r,"thimg_r")
-
-    # l_XMIN = min(l_XMIN, X_l)
-    # l_XMAX = max(l_XMAX, X_l)
-    # r_XMIN = min(r_XMIN, X_r)
-    # r_XMAX = max(r_XMAX, X_r)
-    # print(f"L:{l_XMAX-l_XMIN} R:{r_XMAX-r_XMIN}")
-    # print(f"Angle is {angleCal(l_XMAX - l_XMIN, r_XMAX - r_XMIN)}")
 
 
     # region 往复判断

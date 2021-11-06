@@ -80,6 +80,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\task\luansha.py">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\task\myopencvTool.py">
           <value>
             <Attribute>

@@ -11,6 +11,7 @@ ProgramStartTime = time.time()
 file_test = r"http://169.254.121.50:8080/?action=stream"
 cap = cv2.VideoCapture(file_test)
 
+ObjectLength=7.5
 
 # region 模块化算法
 def showimg(img):
@@ -19,7 +20,7 @@ def showimg(img):
 
 
 def imgRoundDect(img):
-    ret, thre_img1 = cv2.threshold(img, 50, 255, cv2.THRESH_BINARY)
+    ret, thre_img1 = cv2.threshold(img, 80, 255, cv2.THRESH_BINARY)
     return 255 - thre_img1
 
 
@@ -90,7 +91,6 @@ isFirstShow = True
 LastX = 0
 DireX = 0
 LastY = 0
-DireY = 0
 Ttime = []
 couter = 0
 startTime = 0
@@ -116,25 +116,16 @@ while True:
     # endregion
     thimg = imgRoundDect(img)  # 二值化
     cv2.imshow("Thred", thimg)
-    # TODO 抗锯齿
-    # thimg=cv2.medianBlur(thimg,ksize=21)
-    # cv2.imshow("thred", thimg)
-    # drawCont(thimg)median = cv2.medianBlur(img,5)
 
-    # drawCont(thimg)
     # region 往复判断
     X, Y = drawCenterPoint(thimg)
     if LastX == 0:
         LastX = X
         DireX = signal(X - LastX)
-    if LastY == 0:
-        LastY = Y
-        DireY = signal(Y - LastY)
     # print(X-LastX)
     if (X - LastX) * DireX < 0 and time.time() - LastTime > 0.5:
         couter = couter + 1
         DireX = -DireX
-        DireY = -DireY
         if couter == 5:
             startTime = time.time()
             LastTime = startTime
@@ -155,5 +146,5 @@ while True:
 
 cap.release()
 cv2.destroyAllWindows()
-print(f"真实摆长:{Lresult}cm,摆线长度:{Lresult - 7.5}cm")
+print(f"真实摆长:{Lresult}cm,摆线长度:{Lresult - ObjectLength}cm")
 winsound.Beep(6000, 2000)

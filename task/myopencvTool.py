@@ -20,31 +20,41 @@ def Time2Length(time):
     return time ** 2 * 9.886 / (4 * math.pi ** 2)
 
 # ===OpenCVAPI ===
+#Basic
 def readAllImgs(imglist,floder):
     imgName = os.listdir(floder)
     for imgn in imgName:
         URL=floder+"/"+imgn
         imglist.append(cv2.imread(URL,cv2.IMREAD_GRAYSCALE))
-        
 def showimgInPanel(img):
     plt.imshow(img, "gray")
     plt.show()
 
-def imgRoundDectEasy(img):
+#二值化方法
+def imgThresholdEasy(img):
     ret, thre_img1 = cv2.threshold(img, 50, 255, cv2.THRESH_BINARY)
     return 255 - thre_img1
-def imgRoundDectAuto(img):
+def imgThresholdCust(img,val):
+    ret, thre_img1 = cv2.threshold(img, val, 255, cv2.THRESH_BINARY)
+    return 255 - thre_img1
+def imgThresholdAuto(img):
     ret, thre_img1 = cv2.threshold(img, 0, 255, cv2.THRESH_OTSU)
     return 255-thre_img1
 def imgThresholdCanny(img):
     return cv2.Canny(img, 200, 255)# TODO Parameter
+
 #通过图像的矩计算中心点，仅仅适用于二值化图像主体有数据其他背景没有数据的情况
 def centerPoint(thimg):
     mom = cv2.moments(thimg)
     center_x = int(mom["m10"] / mom["m00"])
     center_y = int(mom["m01"] / mom["m00"])
     return center_x, center_y
-
+def drawCenterPoint(img,imgName):
+    meanX, meanY = centerPoint(img)
+    img_rgb = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+    cv2.circle(img_rgb, (meanX, meanY), 3, (0, 0, 255))
+    cv2.imshow("centerPoint"+str(imgName), img_rgb)
+    return meanX, meanY
 
 def findRealCont(thimg):
     contours, hierarchy = cv2.findContours(thimg, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
