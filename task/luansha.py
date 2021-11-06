@@ -110,7 +110,7 @@ cap_l.release()
 cap_r.release()
 cv2.destroyAllWindows()
 Lresult_l = Time2Length(2 * np.mean(Ttime_l)) * 100
-Lresult_r = Time2Length(2 * np.mean(Ttime_l)) * 100
+Lresult_r = Time2Length(2 * np.mean(Ttime_r)) * 100
 
 print(f"真实摆长:{Lresult_l}cm,摆线长度:{Lresult_l - ObjectLength}cm")
 print(f"真实摆长:{Lresult_r}cm,摆线长度:{Lresult_r - ObjectLength}cm")
