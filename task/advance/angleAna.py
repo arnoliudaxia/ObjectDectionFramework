@@ -4,52 +4,22 @@ import matplotlib.pyplot as plt
 import time
 import math
 import sys
-import socket
+# sys.path.append("..")
+from task.myopencvTool import *
 
 ProgramStartTime = time.time()
 # 620x480
 cap_l = cv2.VideoCapture(r"http://169.254.121.50:8080/?action=stream")
 cap_r = cv2.VideoCapture(r"http://169.254.3.16:8080/?action=stream")
-cap=-1
 
 # region 模块化算法
 def angleCal(x,y):
     if x!=0 and y!=0 and x!=y:
         return math.atan(x/y)*180/math.pi
-def showimg(img):
-    plt.imshow(img, "gray")
-    plt.show()
-
-
 def imgRoundDect(img):
     ret, thre_img1 = cv2.threshold(img, 50, 255, cv2.THRESH_BINARY)
     return 255 - thre_img1
 
-
-# 计算二值化图像中有数据图像的中心点
-def findRealCont(thimg):
-    contours, hierarchy = cv2.findContours(thimg, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    finalCon = contours[0]
-    for con in contours:
-        if cv2.contourArea(con) < 1000:
-            continue
-        else:
-            finalCon = con
-    finalCon.resize(finalCon.shape[0], 2)
-    return finalCon, thimg
-
-
-def meanPoint(thimg):
-    contours = findRealCont(thimg)
-    avr_x, avr_y = np.mean(contours, axis=0)
-    return int(avr_x), int(avr_y)
-
-
-def centerPoint(thimg):
-    mom = cv2.moments(thimg)
-    center_x = int(mom["m10"] / mom["m00"])
-    center_y = int(mom["m01"] / mom["m00"])
-    return center_x, center_y
 
 
 def drawCenterPoint(img):
@@ -73,18 +43,6 @@ def drawPointonImg(img, px, py):
     img_rgb = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
     cv2.circle(img_rgb, (px, py), 3, (0, 0, 255))
     cv2.imshow("centerPoint", img_rgb)
-
-
-def signal(intput):
-    if intput >= 0:
-        return 1
-    if intput < 0:
-        return -1
-
-
-def Time2Length(time):
-    return time ** 2 * 9.886 / (4 * math.pi ** 2)
-
 
 # endregion
 
