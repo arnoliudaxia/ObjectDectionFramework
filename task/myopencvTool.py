@@ -1,3 +1,5 @@
+import time
+
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
@@ -10,6 +12,9 @@ def signal(intput):
         return 1
     if intput < 0:
         return -1
+def angleCal(x,y):
+    if x!=0 and y!=0 and x!=y:
+        return math.atan(x/y)*180/math.pi
 def Time2Length(time):
     return time ** 2 * 9.886 / (4 * math.pi ** 2)
 #endregion
@@ -44,3 +49,11 @@ def meanPointOfContour(thimg):
     contours = findRealCont(thimg)
     avr_x, avr_y = np.mean(contours, axis=0)
     return int(avr_x), int(avr_y)
+
+class Timer:
+    clock=time.time()
+
+    def Update(self):
+        step=time.time()-self.clock
+        print(f"Time step : {step}; FPS:{int(1.0/step)}")
+        self.clock=time.time()

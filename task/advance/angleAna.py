@@ -5,6 +5,7 @@ import time
 import math
 import sys
 # sys.path.append("..")
+
 from task.myopencvTool import *
 
 ProgramStartTime = time.time()
@@ -66,6 +67,7 @@ l_XMIN = float("inf")
 l_XMAX = -l_XMIN
 r_XMIN = float("inf")
 r_XMAX = -r_XMIN
+
 while True:
     if time.time() - ProgramStartTime > 23:
         break
