@@ -23,11 +23,11 @@ def imgRoundDect(img):
 
 
 
-def drawCenterPoint(img):
+def drawCenterPoint(img,imgName):
     meanX, meanY = centerPoint(img)
     img_rgb = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
     cv2.circle(img_rgb, (meanX, meanY), 3, (0, 0, 255))
-    cv2.imshow("centerPoint", img_rgb)
+    cv2.imshow("centerPoint"+str(imgName), img_rgb)
     return meanX, meanY
 
 
@@ -49,24 +49,33 @@ def drawPointonImg(img, px, py):
 
 # region 控制变量
 isFirstShow = True
-LastX = 0
-DireX = 0
-LastY = 0
-DireY = 0
+LastX_l = -1
+LastX_r = -1
+DireX_l = 0
+DireX_r = 0
+DireY_l = 0
+DireY_r = 0
 Ttime = []
-couter = 0
-startTime = 0
-LastTime = 0
+startTime = time.time()
+LastTime = startTime
 # endregion
 Lresult = 0
 
 # 首先要看看应该用哪个
 frameCounter=0
 
-l_XMIN = float("inf")
-l_XMAX = -l_XMIN
-r_XMIN = float("inf")
-r_XMAX = -r_XMIN
+# l_XMIN = float("inf")
+# l_XMAX = -l_XMIN
+# r_XMIN = float("inf")
+# r_XMAX = -r_XMIN
+
+Lupdated=False
+Rupdated=False
+LastHighX_l=0
+LastHighX_r=0
+Xrange_l=0
+Xrange_r=0
+
 
 while True:
     if time.time() - ProgramStartTime > 23:
@@ -78,46 +87,49 @@ while True:
 
     thimg_l = imgRoundDect(cv2.cvtColor(frame_l, cv2.COLOR_BGR2GRAY))  # 二值化
     thimg_r = imgRoundDect(cv2.cvtColor(frame_r, cv2.COLOR_BGR2GRAY))  # 二值化
-    X_l, Y = drawCenterPoint(thimg_l)
-    X_r, Y = drawCenterPoint(thimg_r)
+    X_l, Y = drawCenterPoint(thimg_l,"thimg_l")
+    X_r, Y = drawCenterPoint(thimg_r,"thimg_r")
 
-    l_XMIN = min(l_XMIN, X_l)
-    l_XMAX = max(l_XMAX, X_l)
-    r_XMIN = min(r_XMIN, X_r)
-    r_XMAX = max(r_XMAX, X_r)
+    # l_XMIN = min(l_XMIN, X_l)
+    # l_XMAX = max(l_XMAX, X_l)
+    # r_XMIN = min(r_XMIN, X_r)
+    # r_XMAX = max(r_XMAX, X_r)
     # print(f"L:{l_XMAX-l_XMIN} R:{r_XMAX-r_XMIN}")
-    print(f"Angle is {angleCal(l_XMAX - l_XMIN, r_XMAX - r_XMIN)}")
+    # print(f"Angle is {angleCal(l_XMAX - l_XMIN, r_XMAX - r_XMIN)}")
 
-    cv2.imshow("Thred1", thimg_l)
-    cv2.imshow("Thred2", thimg_r)
 
     # region 往复判断
-    # X, Y = drawCenterPoint(thimg)
-    #
-    # if LastX == 0:
-    #     LastX = X
-    #     DireX = signal(X - LastX)
-    # if LastY == 0:
-    #     LastY = Y
-    #     DireY = signal(Y - LastY)
-    # # print(X-LastX)
-    # if (X - LastX) * DireX < 0 and time.time() - LastTime > 0.5:
-    #     couter = couter + 1
-    #     DireX = -DireX
-    #     DireY = -DireY
-    #     if couter == 5:
-    #         startTime = time.time()
-    #         LastTime = startTime
-    #     if couter > 5:
-    #         Ttime.append(time.time() - LastTime)
-    #         LastTime = time.time()
-    #         print(f"T is {Ttime[-1]}")
-    #         Lresult = Time2Length(2 * np.mean(Ttime)) * 100
-    #         print(f"L is {Lresult} cm")
-    # LastX = X
-    # LastY = Y
+    if LastX_l == -1:
+        LastX_l = X_l
+        DireX_l = 1
+        LastHighX_l=X_l
+    if LastX_r == -1:
+        LastX_r = X_r
+        DireX_r = 1
+        LastHighX_r = X_r
+    # is Left Reversed
+    # print((X_l - LastX_l) * DireX_l)
+    if (X_l - LastX_l) * DireX_l < 0 :
+        Lupdated=True
+        DireX_l = -DireX_l
+        Xrange_l=abs(LastHighX_l-X_l)
+        LastHighX_l=X_l
+
+    if (X_r - LastX_r) * DireX_r < 0 :
+        Rupdated = True
+        DireX_r = -DireX_r
+        Xrange_r = abs(LastHighX_r - X_r)
+        LastHighX_r=X_r
+
+    LastX_l = X_l
+    LastX_r = X_r
+    if Lupdated and Rupdated:
+        Lupdated=False
+        Rupdated=False
+        print(f"Angle is {angleCal(Xrange_l,Xrange_r)}")
+
     # endreigon
-    # region 按Esc键退出
+    # region Esc close all windows
     k = cv2.waitKey(1)
     if k == 27:
         break
@@ -126,6 +138,4 @@ while True:
 cap_l.release()
 cap_r.release()
 cv2.destroyAllWindows()
-print(f"Final Angle is {angleCal(l_XMAX-l_XMIN,r_XMAX-r_XMIN)}")
-
-#=====Send Result to Terminal=====
+print(f"Final Angle is {angleCal(Xrange_l,Xrange_r)}")

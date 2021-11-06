@@ -1,4 +1,5 @@
 import time
+import os
 
 import cv2
 import numpy as np
@@ -6,7 +7,7 @@ import matplotlib.pyplot as plt
 import math
 
 
-# region MathAndPhysic
+# ===MathAndPhysic ===
 def signal(intput):
     if intput >= 0:
         return 1
@@ -17,8 +18,14 @@ def angleCal(x,y):
         return math.atan(x/y)*180/math.pi
 def Time2Length(time):
     return time ** 2 * 9.886 / (4 * math.pi ** 2)
-#endregion
 
+# ===OpenCVAPI ===
+def readAllImgs(imglist,floder):
+    imgName = os.listdir(floder)
+    for imgn in imgName:
+        URL=floder+"/"+imgn
+        imglist.append(cv2.imread(URL,cv2.IMREAD_GRAYSCALE))
+        
 def showimgInPanel(img):
     plt.imshow(img, "gray")
     plt.show()
@@ -26,6 +33,11 @@ def showimgInPanel(img):
 def imgRoundDectEasy(img):
     ret, thre_img1 = cv2.threshold(img, 50, 255, cv2.THRESH_BINARY)
     return 255 - thre_img1
+def imgRoundDectAuto(img):
+    ret, thre_img1 = cv2.threshold(img, 0, 255, cv2.THRESH_OTSU)
+    return 255-thre_img1
+def imgThresholdCanny(img):
+    return cv2.Canny(img, 200, 255)# TODO Parameter
 #通过图像的矩计算中心点，仅仅适用于二值化图像主体有数据其他背景没有数据的情况
 def centerPoint(thimg):
     mom = cv2.moments(thimg)
@@ -49,7 +61,14 @@ def meanPointOfContour(thimg):
     contours = findRealCont(thimg)
     avr_x, avr_y = np.mean(contours, axis=0)
     return int(avr_x), int(avr_y)
+#开运算操作
+def open_mor(src,kernelSize,iters):
+    kernel = np.ones((kernelSize,kernelSize),np.uint8)
+    opening = cv2.morphologyEx(src,cv2.MORPH_OPEN,kernel, iterations=iters) #iterations进行3次操作
+    cv2.imshow('open',opening)
+    return opening
 
+#===Python Util===
 class Timer:
     clock=time.time()
 
