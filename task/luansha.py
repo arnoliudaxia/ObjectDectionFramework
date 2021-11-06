@@ -40,6 +40,11 @@ LastHighX_l=0
 LastHighX_r=0
 Xrange_l=0
 Xrange_r=0
+
+l_XMIN = 0
+l_XMAX = 0
+r_XMIN = 0
+r_XMAX = 0
 while True:
     #timer Break
     if time.time() - ProgramStartTime > 23:
@@ -53,6 +58,10 @@ while True:
     X_l, Y = drawCenterPoint(thimg_l,"thimg_l")
     X_r, Y = drawCenterPoint(thimg_r,"thimg_r")
 
+    l_XMIN = min(l_XMIN, X_l)
+    l_XMAX = max(l_XMAX, X_l)
+    r_XMIN = min(r_XMIN, X_r)
+    r_XMAX = max(r_XMAX, X_r)
     # Initialize the first Value
     if LastX_l == -1:
         LastX_l = X_l
@@ -112,8 +121,10 @@ cv2.destroyAllWindows()
 Lresult_l = Time2Length(2 * np.mean(Ttime_l)) * 100
 Lresult_r = Time2Length(2 * np.mean(Ttime_r)) * 100
 
-print(f"真实摆长:{Lresult_l}cm,摆线长度:{Lresult_l - ObjectLength}cm")
-print(f"真实摆长:{Lresult_r}cm,摆线长度:{Lresult_r - ObjectLength}cm")
+if (l_XMAX-l_XMIN)>(r_XMAX-r_XMIN):
+    print(f"真实摆长:{Lresult_l}cm,摆线长度:{Lresult_l - ObjectLength}cm")
+else:
+    print(f"真实摆长:{Lresult_r}cm,摆线长度:{Lresult_r - ObjectLength}cm")
 
 print(f"Final Angle is {angleCal(Xrange_l,Xrange_r)}")
 
