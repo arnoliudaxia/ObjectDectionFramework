@@ -45,6 +45,20 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\task\MotionMethod\angleAna_ADV.py">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\task\MotionMethod\specialAngleAutoAnalysze_ADV.py">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\task\advance\angleAna.py">
           <value>
             <Attribute>
@@ -56,6 +70,13 @@
           <value>
             <Attribute>
               <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\task\basic\LengthDect_ADV.py">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
             </Attribute>
           </value>
         </entry>

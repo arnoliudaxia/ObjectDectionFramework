@@ -82,7 +82,7 @@ while True:
     # region GoBackDect
 
     # is Left Reversed
-    if (X_l - LastX_l) * DireX_l < 0:
+    if (X_l - LastX_l) * DireX_l < -1 and framesReadCounter_l > 25:
         DireX_l = -DireX_l
 
         #Length Calculate Data
@@ -96,7 +96,7 @@ while True:
         Lupdated=True
         Xrange_l=abs(LastHighX_l-X_l)
         LastHighX_l=X_l
-    if (X_r - LastX_r) * DireX_r < 0 :
+    if (X_r - LastX_r) * DireX_r < -1 and framesReadCounter_r > 25:
         DireX_r = -DireX_r
 
         # Length Calculate Data
@@ -125,8 +125,7 @@ while True:
         break
     # endregion
 
-cap_l.release()
-cap_r.release()
+camera.releasCam()
 cv2.destroyAllWindows()
 Lresult_l = Time2Length(2 * np.mean(Ttime_l[1:])) * 100
 Lresult_r = Time2Length(2 * np.mean(Ttime_r[1:])) * 100
