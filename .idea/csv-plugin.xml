@@ -66,6 +66,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\task\basic\findLaserPen2_Colored.py">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\task\basic\findLaserPen2_MotionDectVersion.py">
           <value>
             <Attribute>

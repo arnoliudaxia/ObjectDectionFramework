@@ -29,8 +29,25 @@ def readAllImgs(imglist,floder):
 def showimgInPanel(img):
     plt.imshow(img, "gray")
     plt.show()
+#Read Img with MotionDect
+cap_l = cv2.VideoCapture(r"http://169.254.121.50:8080/?action=stream")
+cap_r = cv2.VideoCapture(r"http://169.254.3.16:8080/?action=stream")
+def releasCam():
+    cap_l.release()
+    cap_r.release()
 
-#二值化方法
+#Open And Close
+def open_mor(src,kernelsize,iter):
+    kernel = np.ones((kernelsize,kernelsize),np.uint8)
+    opening = cv2.morphologyEx(src,cv2.MORPH_OPEN,kernel, iterations=iter) #iterations进行3次操作
+    # cv.imshow('open',opening)
+    return opening
+def close_mor(src,kernelsize,iter):
+    kernel = np.ones((kernelsize,kernelsize),np.uint8)
+    opening = cv2.morphologyEx(src,cv2.MORPH_CLOSE,kernel, iterations=iter) #iterations进行3次操作
+    # cv.imshow('open',opening)
+    return opening
+#Threshold
 def imgThresholdEasy(img):
     ret, thre_img1 = cv2.threshold(img, 50, 255, cv2.THRESH_BINARY)
     return 255 - thre_img1
@@ -43,9 +60,11 @@ def imgThresholdAuto(img):
 def imgThresholdCanny(img):
     return cv2.Canny(img, 200, 255)# TODO Parameter
 
-#通过图像的矩计算中心点，仅仅适用于二值化图像主体有数据其他背景没有数据的情况
+
 def centerPoint(thimg):
     mom = cv2.moments(thimg)
+    if mom["m00"]==0:
+        return 0,0
     center_x = int(mom["m10"] / mom["m00"])
     center_y = int(mom["m01"] / mom["m00"])
     return center_x, center_y
@@ -71,12 +90,6 @@ def meanPointOfContour(thimg):
     contours = findRealCont(thimg)
     avr_x, avr_y = np.mean(contours, axis=0)
     return int(avr_x), int(avr_y)
-#开运算操作
-def open_mor(src,kernelSize,iters):
-    kernel = np.ones((kernelSize,kernelSize),np.uint8)
-    opening = cv2.morphologyEx(src,cv2.MORPH_OPEN,kernel, iterations=iters) #iterations进行3次操作
-    cv2.imshow('open',opening)
-    return opening
 
 #===Python Util===
 class Timer:

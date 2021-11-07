@@ -27,8 +27,8 @@ DireY_r = 0
 Ttime_l = []
 Ttime_r = []
 startTime = time.time()
-LastTime_l = startTime
-LastTime_r = startTime
+# LastTime_l = startTime
+# LastTime_r = startTime
 # endregion
 Lresult_l = 0
 Lresult_r = 0
@@ -45,16 +45,25 @@ l_XMIN = 0
 l_XMAX = 0
 r_XMIN = 0
 r_XMAX = 0
+
+framesReadCounter_l=0
+framesReadCounter_r=0
+FPS=30
 while True:
     #timer Break
-    if time.time() - ProgramStartTime > 23:
+    if time.time() - ProgramStartTime > 15:
         break
     # region Take image and basic Process
     ret, frame_l = cap_l.read()
     ret, frame_r = cap_r.read()
+    framesReadCounter_l=framesReadCounter_l+1
+    framesReadCounter_r=framesReadCounter_r+1
 
     thimg_l = imgThresholdCust(cv2.cvtColor(frame_l, cv2.COLOR_BGR2GRAY),80)  # 二值化
     thimg_r = imgThresholdCust(cv2.cvtColor(frame_r, cv2.COLOR_BGR2GRAY),80)  # 二值化
+
+    showimgInPanel(thimg_l)
+
     X_l, Y = drawCenterPoint(thimg_l,"thimg_l")
     X_r, Y = drawCenterPoint(thimg_r,"thimg_r")
 
@@ -77,11 +86,11 @@ while True:
         DireX_l = -DireX_l
 
         #Length Calculate Data
-        Ttime_l.append(time.time() - LastTime_l)
-        LastTime_l = time.time()
-        # print(f"T is {Ttime_l[-1]}")
-        # Lresult_l = Time2Length(2 * np.mean(Ttime_l)) * 100
-        # print(f"L1 is {Lresult_l} cm")
+        Ttime_l.append(framesReadCounter_l*(1.0/FPS))
+        framesReadCounter_l=0
+        print(f"T is {Ttime_l[-1]}")
+        Lresult_l = Time2Length(2 * Ttime_l[-1]) * 100
+        print(f"L1 is {Lresult_l} cm")
 
         #Angle Analys Data
         Lupdated=True
@@ -91,7 +100,8 @@ while True:
         DireX_r = -DireX_r
 
         # Length Calculate Data
-        Ttime_r.append(time.time() - LastTime_r)
+        Ttime_r.append(framesReadCounter_r*(1.0/FPS))
+        framesReadCounter_r=0
         LastTime_r = time.time()
         # print(f"T is {Ttime[-1]}")
         # Lresult_r= Time2Length(2 * np.mean(Ttime_r)) * 100
@@ -118,13 +128,13 @@ while True:
 cap_l.release()
 cap_r.release()
 cv2.destroyAllWindows()
-Lresult_l = Time2Length(2 * np.mean(Ttime_l)) * 100
-Lresult_r = Time2Length(2 * np.mean(Ttime_r)) * 100
+Lresult_l = Time2Length(2 * np.mean(Ttime_l[1:])) * 100
+Lresult_r = Time2Length(2 * np.mean(Ttime_r[1:])) * 100
 
-if (l_XMAX-l_XMIN)>(r_XMAX-r_XMIN):
-    print(f"真实摆长:{Lresult_l}cm,摆线长度:{Lresult_l - ObjectLength}cm")
-else:
-    print(f"真实摆长:{Lresult_r}cm,摆线长度:{Lresult_r - ObjectLength}cm")
+# if (l_XMAX-l_XMIN)>(r_XMAX-r_XMIN):
+print(f"真实摆长:{Lresult_l}cm,摆线长度:{Lresult_l - ObjectLength}cm")
+# else:
+print(f"真实摆长:{Lresult_r}cm,摆线长度:{Lresult_r - ObjectLength}cm")
 
 print(f"Final Angle is {angleCal(Xrange_l,Xrange_r)}")
 
