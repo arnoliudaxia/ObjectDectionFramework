@@ -31,7 +31,7 @@ while True:
         break
     # frame = cv.resize(frame, (500, 500), interpolation=cv.INTER_CUBIC)
     frame_motion = frame.copy()
-    cv.imshow("source", frame_motion)
+    # cv.imshow("source", frame_motion)
 
     # 计算前景掩码
     fgmask = fgbg.apply(frame_motion)
@@ -44,7 +44,7 @@ while True:
     # draw1 = cv.threshold(fgmask, 100, 255, cv.THRESH_BINARY)[1]  # 二值化
     # cv.imshow("Thre",draw1 )
     draw1=open_mor(fgmask,3,1)
-    draw1 = cv.dilate(draw1, kernel, iterations=3)
+    # draw1 = cv.dilate(draw1, kernel, iterations=3)
     cv.imshow("OPENED",draw1)
 
     # 查找检测物体的轮廓,只检测外轮廓,只需4个点来保存轮廓信息

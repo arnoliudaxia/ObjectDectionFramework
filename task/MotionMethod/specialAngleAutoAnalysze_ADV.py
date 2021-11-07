@@ -3,15 +3,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 import math
-import winsound
 import sys
+import socket
 
 ProgramStartTime = time.time()
 # 620x480
-file_test = r"http://169.254.121.50:8080/?action=stream"
-cap = cv2.VideoCapture(file_test)
-
-ObjectLength=9.5
+cap_l = cv2.VideoCapture(r"http://169.254.121.50:8080/?action=stream")
+cap_r = cv2.VideoCapture(r"http://169.254.3.16:8080/?action=stream")
+cap=-1
 
 # region 模块化算法
 def showimg(img):
@@ -20,7 +19,7 @@ def showimg(img):
 
 
 def imgRoundDect(img):
-    ret, thre_img1 = cv2.threshold(img, 80, 255, cv2.THRESH_BINARY)
+    ret, thre_img1 = cv2.threshold(img, 50, 255, cv2.THRESH_BINARY)
     return 255 - thre_img1
 
 
@@ -91,23 +90,50 @@ isFirstShow = True
 LastX = 0
 DireX = 0
 LastY = 0
+DireY = 0
 Ttime = []
 couter = 0
 startTime = 0
 LastTime = 0
 # endregion
 Lresult = 0
-RangeXChangement=0
 
-framesReadCounter=0
-FPS=45
+# 首先要看看应该用哪个
+frameCounter=0
+
+l_XMIN = float("inf")
+l_XMAX = -l_XMIN
+r_XMIN = float("inf")
+r_XMAX = -r_XMIN
+while True:
+    if frameCounter>5:
+        if l_XMAX-l_XMIN>r_XMAX-r_XMIN:
+            cap=cap_l
+        else:
+            cap=cap_r
+        break
+
+    RangeXChangement=0
+
+    ret, frame_l = cap_l.read()
+    ret, frame_r = cap_r.read()
+    frameCounter=frameCounter+1
+
+    thimg_l = imgRoundDect(cv2.cvtColor(frame_l, cv2.COLOR_BGR2GRAY))  # 二值化
+    thimg_r = imgRoundDect(cv2.cvtColor(frame_r, cv2.COLOR_BGR2GRAY))  # 二值化
+    X_l, Y = drawCenterPoint(thimg_l)
+    X_r, Y = drawCenterPoint(thimg_r)
+
+    l_XMIN = min(l_XMIN,X_l)
+    l_XMAX = max(l_XMAX,X_l)
+    r_XMIN =min(r_XMIN,X_r)
+    r_XMAX =max(r_XMAX,X_r)
+
 while True:
     if time.time() - ProgramStartTime > 23:
         break
     # region 取帧
     ret, frame = cap.read()
-    framesReadCounter=framesReadCounter+1
-
     # 如果视频结束，跳出循环
     if not ret:
         break
@@ -121,25 +147,32 @@ while True:
     # endregion
     thimg = imgRoundDect(img)  # 二值化
     cv2.imshow("Thred", thimg)
+    # TODO 抗锯齿
+    # thimg=cv2.medianBlur(thimg,ksize=21)
+    # cv2.imshow("thred", thimg)
+    # drawCont(thimg)median = cv2.medianBlur(img,5)
 
+    # drawCont(thimg)
     # region 往复判断
     X, Y = drawCenterPoint(thimg)
+
     if LastX == 0:
         LastX = X
         DireX = signal(X - LastX)
+    if LastY == 0:
+        LastY = Y
+        DireY = signal(Y - LastY)
     # print(X-LastX)
-    if (X - LastX) * DireX < 0 :
+    if (X - LastX) * DireX < 0 and time.time() - LastTime > 0.5:
         couter = couter + 1
         DireX = -DireX
+        DireY = -DireY
         if couter == 5:
-            # startTime = time.time()
-            # LastTime = startTime
-            framesReadCounter=0
+            startTime = time.time()
+            LastTime = startTime
         if couter > 5:
-            # Ttime.append(time.time() - LastTime)
-            # LastTime = time.time()
-            Ttime.append(framesReadCounter*(1.0/FPS))
-            framesReadCounter=0
+            Ttime.append(time.time() - LastTime)
+            LastTime = time.time()
             print(f"T is {Ttime[-1]}")
             Lresult = Time2Length(2 * np.mean(Ttime)) * 100
             print(f"L is {Lresult} cm")
@@ -154,5 +187,24 @@ while True:
 
 cap.release()
 cv2.destroyAllWindows()
-print(f"真实摆长:{Lresult}cm,摆线长度:{Lresult - ObjectLength}cm")
-winsound.Beep(6000, 2000)
+print(f"真实摆长:{Lresult}cm,摆线长度:{Lresult - 7.5}cm")
+
+#=====Send Result to Terminal=====
+
+# mySocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# host = '169.254.93.228'
+# port = 32768
+#
+# try:
+#     mySocket.connect((host, port))  ##连接到服务器
+#     print("Connected")
+# except:  ##连接不成功，运行最初的ip
+#     print('Offline')
+#
+#
+# msg = str(Lresult - 7.5)+","
+# msg = msg+str(XMAX-XMIN)
+# mySocket.send(msg.encode("utf-8"))
+#
+# print("Sent")
+# mySocket.close()
