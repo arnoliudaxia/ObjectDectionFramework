@@ -4,7 +4,9 @@ import matplotlib.pyplot as plt
 import time
 import math
 import sys
-from myopencvTool import *
+
+from task.MotionMethod.specialAngleAutoAnalysze_ADV import cam
+from task.myopencvTool import *
 # sys.path.append("..")
 
 from task.myopencvTool import *
@@ -125,7 +127,7 @@ while True:
         break
     # endregion
 
-camera.releasCam()
+cam.releasCam()
 cv2.destroyAllWindows()
 Lresult_l = Time2Length(2 * np.mean(Ttime_l[1:])) * 100
 Lresult_r = Time2Length(2 * np.mean(Ttime_r[1:])) * 100

@@ -5,7 +5,6 @@ import time
 import math
 import sys
 from myopencvTool import *
-# sys.path.append("..")
 
 from task.myopencvTool import *
 

@@ -6,7 +6,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
-
+objectLengthFix=0
+AngleFix=0
 # ===MathAndPhysic ===
 def signal(intput):
     if intput >= 0:
@@ -46,15 +47,23 @@ class CamerSystem:
         ret, frame_r = self.cap_r.read()
         fgmask = CamerSystem.fgbg.apply(frame)
         fgmask_r = CamerSystem.fgbg.apply(frame_r)
-        # drawCenterPoint(fgmask, "CenterOfMask1")
-        # drawCenterPoint(fgmask_r, "CenterOfMask2")
+        drawCenterPoint(fgmask, "CenterOfMask1")
+        drawCenterPoint(fgmask_r, "CenterOfMask2")
 
         fgmask = open_mor(fgmask, 2, 1)
         fgmask_r = open_mor(fgmask_r, 2, 1)
         fgmask = close_mor(fgmask, 25, 3)
         fgmask_r = close_mor(fgmask_r, 25, 3)
         return fgmask,fgmask_r
+    def MotionThreshold_l(self):
+        ret, frame = self.cap_l.read()
+        fgmask = CamerSystem.fgbg.apply(frame)
+        # drawCenterPoint(fgmask, "CenterOfMask1")
+        # drawCenterPoint(fgmask_r, "CenterOfMask2")
 
+        fgmask = open_mor(fgmask, 2, 1)
+        fgmask = close_mor(fgmask, 25, 3)
+        return fgmask
 
     def ColorThreshold(self):
         lower_red = np.array([25, 5, 80])
@@ -63,12 +72,12 @@ class CamerSystem:
 #Open And Close
 def open_mor(src,kernelsize,iter):
     kernel = np.ones((kernelsize,kernelsize),np.uint8)
-    opening = cv2.morphologyEx(src,cv2.MORPH_OPEN,kernel, iterations=iter) #iterations进行3次操作
+    opening = cv2.morphologyEx(src,cv2.MORPH_OPEN,kernel, iterations=iter)
     # cv.imshow('open',opening)
     return opening
 def close_mor(src,kernelsize,iter):
     kernel = np.ones((kernelsize,kernelsize),np.uint8)
-    opening = cv2.morphologyEx(src,cv2.MORPH_CLOSE,kernel, iterations=iter) #iterations进行3次操作
+    opening = cv2.morphologyEx(src,cv2.MORPH_CLOSE,kernel, iterations=iter)
     # cv.imshow('open',opening)
     return opening
 #Threshold
@@ -133,5 +142,5 @@ class Timer:
 
     def Update(self):
         step=time.time()-self.clock
-        print(f"Time step : {step}; FPS:{int(1.0/step)}")
+        # print(f"Time step : {step}; FPS:{int(1.0/step)}")
         self.clock=time.time()

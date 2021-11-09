@@ -2,9 +2,12 @@ import winsound
 import sys
 from task.myopencvTool import *
 
+# input("Press Enter To Start")
 # 620x480
 ProgramStartTime = time.time()
 ObjectLength = 10
+ObjectLengthLong = 10
+ObjectLengthShort = 7.5
 
 # region Control Varibles
 LastX = -1
@@ -17,11 +20,10 @@ framesReadCounter = 0
 FPS = 45
 camera = CamerSystem()
 
-input("Press Enter To Start")
 while True:
     if time.time() - ProgramStartTime > 23:
         break
-    frame = camera.MotionThreshold()[0]
+    frame = camera.MotionThreshold_l()
     framesReadCounter = framesReadCounter + 1
 
     # region 往复判断
@@ -48,5 +50,9 @@ while True:
 camera.releasCam()
 cv2.destroyAllWindows()
 Lresult = Time2Length(2 * np.mean(Ttime[2:])) * 100
-print(f"真实摆长:{Lresult}cm,摆线长度:{Lresult - ObjectLength}cm")
+if Lresult<120:
+    RealL=Lresult-ObjectLengthShort
+else:
+    RealL=Lresult-ObjectLengthLong
+print(f"真实摆长:{Lresult}cm,摆线长度:{RealL}cm")
 winsound.Beep(6000, 2000)

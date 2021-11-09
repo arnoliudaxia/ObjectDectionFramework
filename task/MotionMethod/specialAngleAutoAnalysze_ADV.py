@@ -25,7 +25,7 @@ r_XMIN = float("inf")
 r_XMAX = -r_XMIN
 
 RangeXChangement = 0
-
+# input("Press Enter To Start")
 while True:
     if frameCounter > 60:
         if l_XMAX - l_XMIN > r_XMAX - r_XMIN:
