@@ -77,7 +77,9 @@ while True:
     if Lupdated and Rupdated:
         Lupdated = False
         Rupdated = False
-        print(f"Angle is {angleCal(Xrange_l, Xrange_r)}")
+        print("Angle is ")
+        print(angleCal(Xrange_l, Xrange_r))
+        # print(f"Angle is {angleCal(Xrange_l, Xrange_r)}")
         if angleCal(Xrange_l, Xrange_r)!=None:
             resultr=angleCal(Xrange_l, Xrange_r)
             if Xrange_l>Xrange_r:
@@ -95,4 +97,5 @@ while True:
 
 camera.releasCam()
 cv2.destroyAllWindows()
-print(f"Final Angle is {np.mean(AngleData[2:])}")
+print("Final Angle is ")
+print(np.mean(AngleData[2:]))

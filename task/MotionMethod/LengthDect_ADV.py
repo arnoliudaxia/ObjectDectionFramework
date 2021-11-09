@@ -1,4 +1,4 @@
-import winsound
+#import winsound
 import sys
 from task.myopencvTool import *
 
@@ -8,7 +8,7 @@ ProgramStartTime = time.time()
 ObjectLength = 10
 ObjectLengthLong = 10
 ObjectLengthShort = 7.5
-
+ObjectLengthVeryShort = -4
 # region Control Varibles
 LastX = -1
 DireX = 1
@@ -36,9 +36,12 @@ while True:
 
         Ttime.append(framesReadCounter * (1.0 / FPS))
         framesReadCounter = 0
-        print(f"T is {Ttime[-1]}")
+        print("T is ")
+        print(Ttime[-1])
+        # print(f"T is {Ttime[-1]}")
         # Lresult = Time2Length(2 * np.mean(Ttime)) * 100
-        print(f"L is {Time2Length(2 * Ttime[-1]) * 100} cm")
+        print("L is ")
+        print(Time2Length(2 * Ttime[-1]) * 100)
     LastX = X
     # endreigon
     # region Esc Key Halt
@@ -50,9 +53,15 @@ while True:
 camera.releasCam()
 cv2.destroyAllWindows()
 Lresult = Time2Length(2 * np.mean(Ttime[2:])) * 100
-if Lresult<120:
+if Lresult<80:
+    RealL=Lresult-ObjectLengthVeryShort
+elif Lresult<120:
     RealL=Lresult-ObjectLengthShort
 else:
     RealL=Lresult-ObjectLengthLong
-print(f"真实摆长:{Lresult}cm,摆线长度:{RealL}cm")
-winsound.Beep(6000, 2000)
+print("Real Length(cm):")
+print(Lresult)
+print("The length of line(cm):")
+print(RealL)
+# print(f"真实摆长:{Lresult}cm,摆线长度:{RealL}cm")
+# winsound.Beep(6000, 2000)

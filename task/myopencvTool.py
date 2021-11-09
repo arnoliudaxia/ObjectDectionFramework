@@ -34,8 +34,8 @@ def showimgInPanel(img):
 
 class CamerSystem:
     #Read Img and simple process
-    cap_l = cv2.VideoCapture(r"http://169.254.121.50:8080/?action=stream")
-    cap_r = cv2.VideoCapture(r"http://169.254.3.16:8080/?action=stream")
+    cap_l = cv2.VideoCapture(r"http://192.168.0.103:8080/?action=stream")
+    cap_r = cv2.VideoCapture(r"http://192.168.0.112:8080/?action=stream")
     #Read Img with MotionDect
     def releasCam(self):
         self.cap_l.release()
