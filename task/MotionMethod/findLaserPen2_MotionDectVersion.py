@@ -1,4 +1,5 @@
 import cv2 as cv
+import sys
 import numpy as np
 from task.myopencvTool import *
 
@@ -40,8 +41,10 @@ while True:
     # draw1 = cv.dilate(draw1, kernel, iterations=3)
     # cv.imshow("OPENED",draw1)
 
-    l,contours_m, hierarchy_m = cv.findContours(fgmask.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-
+    if sys.platform.startswith('win'):
+        contours_m, hierarchy_m = cv.findContours(fgmask.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+    else:
+        h,contours_m, hierarchy_m = cv.findContours(fgmask.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
     NoSat=True
     for c in contours_m:
         # print(cv.contourArea(c))
@@ -52,6 +55,10 @@ while True:
         cv.rectangle(frame, (x, y), (x + w, y + h), color_m, 2)
     if NoSat:
         cv.rectangle(frame, (Lx, Ly), (Lx + Lw, Ly + Lh), color_m, 2)
+    # Center Cross Line
+    CenterCor=(320,240)
+    cv2.line(frame,(320,220),(320,260),(0,0,255),2)
+    cv2.line(frame,(300,240),(340,240),(0,0,255),2)
     cv.imshow("apply", frame)
     k = cv.waitKey(1)
     if k == 27:

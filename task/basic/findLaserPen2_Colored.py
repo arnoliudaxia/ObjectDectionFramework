@@ -14,7 +14,7 @@ def close_mor(src,kernelsize,iter):
     # cv.imshow('open',opening)
     return opening
 # 设置文件
-file_test = r"http://169.254.121.50:8080/?action=stream"
+file_test = r"http://192.168.0.120:8080/?action=stream"
 
 cap = cv.VideoCapture(file_test)
 
@@ -27,15 +27,12 @@ color_m = (0, 0, 255)
 # fgbg=cv.createBackgroundSubtractorMOG2(detectShadows=False,varThreshold=20)
 # fgbg =cv.createBackgroundSubtractorKNN()
 
-lower_red = np.array([25,5,80])#在此调参
-upper_red = np.array([60,30,125])
+lower_red = np.array([25,20,70])
+upper_red = np.array([60,50,100])
 # 113, 12, 42
 while True:
     # 读取一帧
     ret, frame = cap.read()
-    # 如果视频结束，跳出循环
-    if not ret:
-        break
     # frame = cv.resize(frame, (500, 500), interpolation=cv.INTER_CUBIC)
     frame_motion = frame.copy()
     cv.imshow("source", frame_motion)
@@ -43,15 +40,16 @@ while True:
 
     color_fliter=cv.inRange(frame_motion,lower_red,upper_red)
     # cv.imshow("Color",color_fliter)
-    drawCenterPoint(color_fliter,"Color")
+    drawCenterPoint(color_fliter.copy(),"Color")
 
-    openedMask = open_mor(color_fliter, 3, 1)
-    # print(cv.moments(closedMask)["m00"])
-    drawCenterPoint(openedMask, "CenterOfMog")
-
-    closedMask=close_mor(openedMask,30,5)
-    # print(cv.moments(closedMask)["m00"])
-    drawCenterPoint(closedMask,"CenterOfMog2")
+    # openedMask = open_mor(color_fliter, 3, 1)
+    # # print(cv.moments(closedMask)["m00"])
+    # drawCenterPoint(openedMask, "CenterOfMog")
+    #
+    # closedMask=close_mor(openedMask,30,5)
+    # # print(cv.moments(closedMask)["m00"])
+    # drawCenterPoint(closedMask,"CenterOfMog2")
+    closedMask=color_fliter
 
 
 
@@ -62,8 +60,8 @@ while True:
 
     for c in contours_m:
         print(cv.contourArea(c))
-        # if cv.contourArea(c) < 100:
-        #     continue
+        if cv.contourArea(c) < 1000:
+            continue
         (x, y, w, h) = cv.boundingRect(c)
         cv.rectangle(frame_motion, (x-10, y-10), (x + w, y + h), color_m, 2)
 
