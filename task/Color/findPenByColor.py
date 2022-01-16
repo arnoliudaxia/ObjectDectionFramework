@@ -1,11 +1,11 @@
 import cv2
 import numpy as np
 
-from task.myopencvTool import *
+from toolbox.opencvFramework import *
 
 
-
-cap = cv2.VideoCapture(2)
+camS=CamerSystem()
+cap = camS.cap_l
 color_m=(0,0,255)#外边框颜色
 f = open("color.ini", "r")
 ini=f.readline().split(" ")

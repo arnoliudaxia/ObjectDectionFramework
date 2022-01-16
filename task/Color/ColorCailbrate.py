@@ -1,65 +1,55 @@
-#此程序是调整Color Mask 的参数的
-import cv2 as cv
-import numpy as np
-from task.myopencvTool import *
+# 此程序是调整Color Mask 的参数的
+from toolbox.opencvFramework import *
+
+cam = CamerSystem()
+
+low, high = readColorIni()
+icol = low.tolist() + high.tolist()
 
 
 
-cap = cv.VideoCapture(2)
-color_m=(0,0,255)
-
-f = open("color.ini", "r")
-ini=f.readline().split(" ")
-icol =[int(i) for i in ini]  # Red
 
 
-#创建窗体动态调参
+#region 创建窗体
+# 创建空回调函数
 def nothing(*arg):
-        pass
-cv2.namedWindow('colorTest',cv2.WINDOW_NORMAL)
+    pass
+cv2.namedWindow('ColorFilter', cv2.WINDOW_NORMAL)
+cv2.createTrackbar("speed(%)", "ColorFilter", 100, 200, nothing)
 # Lower range colour sliders.
-cv2.createTrackbar('lowR', 'colorTest', icol[2], 255, nothing)
-cv2.createTrackbar('lowG', 'colorTest', icol[1], 255, nothing)
-cv2.createTrackbar('lowB', 'colorTest', icol[0], 255, nothing)
+cv2.createTrackbar('lowR', 'ColorFilter', icol[2], 255, nothing)
+cv2.createTrackbar('lowG', 'ColorFilter', icol[1], 255, nothing)
+cv2.createTrackbar('lowB', 'ColorFilter', icol[0], 255, nothing)
 # Higher range colour sliders.
-cv2.createTrackbar('highR', 'colorTest', icol[5], 255, nothing)
-cv2.createTrackbar('highG', 'colorTest', icol[4], 255, nothing)
-cv2.createTrackbar('highB', 'colorTest', icol[3], 255, nothing)
-
-
+cv2.createTrackbar('highR', 'ColorFilter', icol[5], 255, nothing)
+cv2.createTrackbar('highG', 'ColorFilter', icol[4], 255, nothing)
+cv2.createTrackbar('highB', 'ColorFilter', icol[3], 255, nothing)
+#endregion
 while True:
 
-    lowR = cv2.getTrackbarPos('lowR', 'colorTest')
-    lowG = cv2.getTrackbarPos('lowG', 'colorTest')
-    lowB = cv2.getTrackbarPos('lowB', 'colorTest')
-    highR = cv2.getTrackbarPos('highR', 'colorTest')
-    highG = cv2.getTrackbarPos('highG', 'colorTest')
-    highB = cv2.getTrackbarPos('highB', 'colorTest')
+    lowR = cv2.getTrackbarPos('lowR', 'ColorFilter')
+    lowG = cv2.getTrackbarPos('lowG', 'ColorFilter')
+    lowB = cv2.getTrackbarPos('lowB', 'ColorFilter')
+    highR = cv2.getTrackbarPos('highR', 'ColorFilter')
+    highG = cv2.getTrackbarPos('highG', 'ColorFilter')
+    highB = cv2.getTrackbarPos('highB', 'ColorFilter')
+    speed = cv2.getTrackbarPos('speed(%)', 'ColorFilter')
 
-    # 读取
-    ret, frame = cap.read()
-    # frame = cv.resize(frame, (500, 500), interpolation=cv.INTER_CUBIC)
-    frame = cv2.GaussianBlur(frame, (7, 7), 0)
-    frame = cv2.medianBlur(frame, 7)
-    cv.imshow("source", frame)
-    frame_motion=frame
-    # frameBGR = cv2.bilateralFilter(frameBGR, 15 ,75, 75)
 
     # 颜色过滤器
-    lower_red=np.array([lowB,lowG,lowR])
-    upper_red=np.array([highB,highG,highR])
-    color_fliter = cv.inRange(frame_motion, lower_red, upper_red)
-    cv.imshow("Color", color_fliter)
+    lower_red = np.array([lowB, lowG, lowR])
+    upper_red = np.array([highB, highG, highR])
+    frame=cam.ColorThreshold(colorBound=[lower_red,upper_red])
+    if frame is None:
+        break
+    cv2.imshow("ColorFilter", frame)
 
-    k = cv.waitKey(1)
+    k = cv2.waitKey(int(1000 / cam.getFPS() / ((speed+1)/100)))
     if k == 27:
         break
-    if k==ord("s"):
-        f = open("color.ini", "w")
-        inicon=[lowB,lowG,lowR,highB,highG,highR]
-        f.write(" ".join([str(i) for i in inicon]))
-        f.close()
+    if k == ord("s"):
+        saveColorini([[lowB, lowG, lowR],[highB, highG, highR]])
         break
 
-cap.release()
-cv.destroyAllWindows()
+cam.releasCam()
+cv2.destroyAllWindows()
