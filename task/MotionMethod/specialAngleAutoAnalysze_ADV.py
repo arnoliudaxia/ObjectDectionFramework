@@ -37,8 +37,8 @@ while True:
     frame_l, frame_r = cam.MotionThreshold()
     frameCounter = frameCounter + 1
 
-    X_l, Y = drawCenterPoint(frame_l, "Left")
-    X_r, Y = drawCenterPoint(frame_r, "Right")
+    X_l, Y = centerPoint(frame_l)
+    X_r, Y = centerPoint(frame_r)
 
     l_XMIN = min(l_XMIN, X_l)
     l_XMAX = max(l_XMAX, X_l)
