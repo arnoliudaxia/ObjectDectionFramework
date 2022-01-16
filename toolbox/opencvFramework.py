@@ -117,7 +117,7 @@ class CamerSystem:
         fgmask = close_mor(fgmask, 50, 1)
         return centerPoint(fgmask)
 
-    def ColorThreshold(self,blurKernelSize=5,colorBound=None,showSource=True):
+    def ColorThreshold(self,blurKernelSize=5,colorBound=None,showSource=True,keepOrigin=False):
         self.loadConfigue()
         if colorBound==None:
             lower_bound = self.lower_red
@@ -131,22 +131,25 @@ class CamerSystem:
             return None
         if showSource:
             cv2.imshow("source", frame)
-        frame = cv2.GaussianBlur(frame, (blurKernelSize, blurKernelSize), 0)
-        color_fliter = cv2.inRange(frame, lower_bound, upper_bound)
+        blured = cv2.GaussianBlur(frame, (blurKernelSize, blurKernelSize), 0)
+        color_fliter = cv2.inRange(blured, lower_bound, upper_bound)
         color_fliter= cv2.erode(color_fliter,(10,10),iterations=3)
         color_fliter = open_mor(color_fliter, 5, 1)
 
+        if keepOrigin:
+            return frame,color_fliter
         return color_fliter
-    def GetCenterByColor(self):
-        closedMask=self.ColorThreshold()
+
+    def GetCenterByLongestContour(self,img):
         if sys.platform.startswith('win'):
-            contours_m, hierarchy_m = cv2.findContours(closedMask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            contours_m, hierarchy_m = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         else:
-            h, contours_m, hierarchy_m = cv2.findContours(closedMask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            h, contours_m, hierarchy_m = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
         areas = [cv2.contourArea(c) for c in contours_m]
         longestArea = contours_m[np.nanargmax(areas)]
         (x, y, w, h) = cv2.boundingRect(longestArea)
+
         return round((2 * x + w) / 2), round((2 * y + h) / 2)
 
 
