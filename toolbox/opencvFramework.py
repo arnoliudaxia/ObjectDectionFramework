@@ -9,9 +9,12 @@ from .setting import *
 
 class DectionMethod(Enum):
     ColorFilter = 1
+
+
 class ProcessType(Enum):
-    CenterCoordinate=1
-    Bound=2
+    CenterCoordinate = 1
+    Bound = 2
+
 
 objectLengthFix = 0
 AngleFix = 0
@@ -19,14 +22,6 @@ AngleFix = 0
 # 网络摄像头URL示例 r"http://192.168.0.120:8080/?action=stream"
 cameraMainURL = r"C:\Users\Arnoliu\PycharmProjects\opecvtry\testcase\WIN_20220113_17_57_44_Pro.mp4"
 cameraViceURL = 0
-
-
-# ===OpenCVAPI ===
-# ==Basic==
-def showimgInPanel(img):
-    plt.imshow(img, "gray")
-    plt.show()
-
 
 ###########################################
 class CamerSystem:
@@ -151,7 +146,7 @@ class CamerSystem:
             return frame, color_fliter
         return color_fliter
 
-    def GetCenterByLongestContour(self, img,type=ProcessType.CenterCoordinate,debug=False):
+    def GetCenterByLongestContour(self, img, type=ProcessType.CenterCoordinate, debug=False):
         if sys.platform.startswith('win'):
             contours_m, hierarchy_m = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         else:
@@ -160,15 +155,15 @@ class CamerSystem:
         areas = [cv2.contourArea(c) for c in contours_m]
         longestArea = contours_m[np.nanargmax(areas)]
 
-        if type==ProcessType.CenterCoordinate:
+        if type == ProcessType.CenterCoordinate:
             hull = cv2.convexHull(longestArea)
 
             if debug:
-                debugImg=cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
+                debugImg = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
                 length = len(hull)
                 for i in range(len(hull)):
                     cv2.line(debugImg, tuple(hull[i][0]), tuple(hull[(i + 1) % length][0]), (0, 255, 0), 2)
-                cv2.imshow("Debug",debugImg)
+                cv2.imshow("Debug", debugImg)
             return hull.mean(axis=0).tolist()[0]
             # return round((2 * x + w) / 2), round((2 * y + h) / 2)
         else:
