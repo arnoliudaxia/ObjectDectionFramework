@@ -151,7 +151,7 @@ class CamerSystem:
             return frame, color_fliter
         return color_fliter
 
-    def GetCenterByLongestContour(self, img,type=ProcessType.CenterCoordinate):
+    def GetCenterByLongestContour(self, img,type=ProcessType.CenterCoordinate,debug=False):
         if sys.platform.startswith('win'):
             contours_m, hierarchy_m = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         else:
@@ -159,10 +159,20 @@ class CamerSystem:
 
         areas = [cv2.contourArea(c) for c in contours_m]
         longestArea = contours_m[np.nanargmax(areas)]
-        (x, y, w, h) = cv2.boundingRect(longestArea)
+
         if type==ProcessType.CenterCoordinate:
-            return round((2 * x + w) / 2), round((2 * y + h) / 2)
+            hull = cv2.convexHull(longestArea)
+
+            if debug:
+                debugImg=cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
+                length = len(hull)
+                for i in range(len(hull)):
+                    cv2.line(debugImg, tuple(hull[i][0]), tuple(hull[(i + 1) % length][0]), (0, 255, 0), 2)
+                cv2.imshow("Debug",debugImg)
+            return hull.mean(axis=0).tolist()[0]
+            # return round((2 * x + w) / 2), round((2 * y + h) / 2)
         else:
+            (x, y, w, h) = cv2.boundingRect(longestArea)
             return x, y, w, h
 
 

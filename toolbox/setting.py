@@ -17,7 +17,7 @@ def readColorIni():
 def saveColorini(ColorBound):
     ColorBound[0]=[str(i) for i in ColorBound[0]]
     ColorBound[1]=[str(i) for i in ColorBound[1]]
-    f = open("color.ini", "r+")
+    f = open(iniURL, "r+")
     inis = f.readlines()
     Towrite=[]
     for ini in inis:
