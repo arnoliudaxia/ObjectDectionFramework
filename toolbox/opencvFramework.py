@@ -1,17 +1,24 @@
-import os
 import sys
+from enum import Enum
+
 import cv2
-import numpy as np
 import matplotlib.pyplot as plt
+
 from .setting import *
 
+
+class DectionMethod(Enum):
+    ColorFilter = 1
+class ProcessType(Enum):
+    CenterCoordinate=1
+    Bound=2
 
 objectLengthFix = 0
 AngleFix = 0
 
-#网络摄像头URL示例 r"http://192.168.0.120:8080/?action=stream"
-cameraMainURL=r"C:\Users\Arnoliu\PycharmProjects\opecvtry\testcase\WIN_20220113_17_57_44_Pro.mp4"
-cameraViceURL=0
+# 网络摄像头URL示例 r"http://192.168.0.120:8080/?action=stream"
+cameraMainURL = r"C:\Users\Arnoliu\PycharmProjects\opecvtry\testcase\WIN_20220113_17_57_44_Pro.mp4"
+cameraViceURL = 0
 
 
 # ===OpenCVAPI ===
@@ -21,23 +28,22 @@ def showimgInPanel(img):
     plt.show()
 
 
-
 ###########################################
 class CamerSystem:
     fgbg = cv2.createBackgroundSubtractorKNN()
 
-    def __init__(self,oneOrTwoCamera=1):
+    def __init__(self, oneOrTwoCamera=1):
         # 根据用户的选择开启几个摄像头
-        self.CameraNumber=oneOrTwoCamera
-        assert oneOrTwoCamera!=1 or oneOrTwoCamera!=2
-        if oneOrTwoCamera>=1:
+        self.CameraNumber = oneOrTwoCamera
+        assert oneOrTwoCamera != 1 or oneOrTwoCamera != 2
+        if oneOrTwoCamera >= 1:
             self.cap_l = cv2.VideoCapture(cameraMainURL)
-        if oneOrTwoCamera==2:
+        if oneOrTwoCamera == 2:
             self.cap_r = cv2.VideoCapture(cameraViceURL)
 
-    #读取配置文件
+    # 读取配置文件
     def loadConfigue(self):
-        self.lower_red,self.upper_red=readColorIni()
+        self.lower_red, self.upper_red = readColorIni()
 
     def takeImg(self):
         ret, frame = self.cap_l.read()
@@ -45,8 +51,10 @@ class CamerSystem:
             print("No Stream or stream stopped!")
             return False
         return frame
+
     def getFPS(self):
         return self.cap_l.get(propId=cv2.CAP_PROP_FPS)
+
     def releasCam(self):
         if self.CameraNumber >= 1:
             self.cap_l.release()
@@ -117,30 +125,33 @@ class CamerSystem:
         fgmask = close_mor(fgmask, 50, 1)
         return centerPoint(fgmask)
 
-    def ColorThreshold(self,blurKernelSize=5,colorBound=None,showSource=True,keepOrigin=False):
+    def ColorThreshold(self, img=None, blurKernelSize=5, colorBound=None, showSource=True, keepOrigin=False):
         self.loadConfigue()
-        if colorBound==None:
+        if colorBound == None:
             lower_bound = self.lower_red
             upper_bound = self.upper_red
         else:
             lower_bound = colorBound[0]
             upper_bound = colorBound[1]
 
-        frame=self.takeImg()
-        if frame is None:
-            return None
+        if img is None:
+            frame = self.takeImg()
+            if frame is None:
+                return None
+        else:
+            frame = img
         if showSource:
             cv2.imshow("source", frame)
         blured = cv2.GaussianBlur(frame, (blurKernelSize, blurKernelSize), 0)
         color_fliter = cv2.inRange(blured, lower_bound, upper_bound)
-        color_fliter= cv2.erode(color_fliter,(10,10),iterations=3)
+        color_fliter = cv2.erode(color_fliter, (10, 10), iterations=3)
         color_fliter = open_mor(color_fliter, 5, 1)
 
         if keepOrigin:
-            return frame,color_fliter
+            return frame, color_fliter
         return color_fliter
 
-    def GetCenterByLongestContour(self,img):
+    def GetCenterByLongestContour(self, img,type=ProcessType.CenterCoordinate):
         if sys.platform.startswith('win'):
             contours_m, hierarchy_m = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         else:
@@ -149,25 +160,28 @@ class CamerSystem:
         areas = [cv2.contourArea(c) for c in contours_m]
         longestArea = contours_m[np.nanargmax(areas)]
         (x, y, w, h) = cv2.boundingRect(longestArea)
+        if type==ProcessType.CenterCoordinate:
+            return round((2 * x + w) / 2), round((2 * y + h) / 2)
+        else:
+            return x, y, w, h
 
-        return round((2 * x + w) / 2), round((2 * y + h) / 2)
 
-
-
-
-#region Open And Close
+# region Open And Close
 def open_mor(src, kernelsize, iter):
     kernel = np.ones((kernelsize, kernelsize), np.uint8)
     opening = cv2.morphologyEx(src, cv2.MORPH_OPEN, kernel, iterations=iter)
     return opening
 
-#! Do not use this
+
+# ! Do not use this
 def close_mor(src, kernelsize, iter):
     kernel = np.ones((kernelsize, kernelsize), np.uint8)
     opening = cv2.morphologyEx(src, cv2.MORPH_CLOSE, kernel, iterations=iter)
     return opening
-#endregion
-#直接计算图像的重心
+
+
+# endregion
+# 直接计算图像的重心
 def centerPoint(thimg):
     mom = cv2.moments(thimg)
     if mom["m00"] == 0:

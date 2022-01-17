@@ -7,19 +7,10 @@ while True:
     ori,frame=camS.ColorThreshold(keepOrigin=True,showSource=False)
     if frame is None:
         break
+    (x, y, w, h) =camS.GetCenterByLongestContour(img=frame,type=ProcessType.Bound)
 
-    if sys.platform.startswith('win'):
-        contours_m, hierarchy_m = cv2.findContours(frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    else:
-        h, contours_m, hierarchy_m = cv2.findContours(frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-    areas=[cv2.contourArea(c) for c in contours_m]
-    longestArea=contours_m[np.nanargmax(areas)]
-    (x, y, w, h) = cv2.boundingRect(longestArea)
-    frame_motion=frame
     cv2.rectangle(ori, (x, y), (x + w, y + h), (0,0,255), 2)
     X, Y = round((2 * x + w) / 2), round((2 * y + h) / 2)
-    # cv2.circle(ori, (X, Y), 2, (255, 0, 0))
     #绘制中心十字线
     centerRreference=(320,240)
     cv2.line(ori, (320, 220), (320, 260), (0, 0, 255), 2)
