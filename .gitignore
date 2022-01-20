@@ -1,3 +1,5 @@
 /video/
 /testcase/
 /ref/
+
+*/__pycache__/

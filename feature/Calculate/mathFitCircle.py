@@ -3,7 +3,7 @@ import cv2
 import matplotlib.pyplot as plt
 import scipy.optimize as opt
 
-f = open("data.txt", "r")
+f = open("../data.txt", "r")
 data = f.readlines()
 f.close()
 points = []
@@ -16,7 +16,8 @@ for point in data.astype(np.int):
     cv2.circle(trackImg, point, 1, (255, 255, 255))
 cv2.imshow("track", trackImg)
 
-rx = int(data.mean(axis=0)[0])
+
+rx = int(data.mean(axis=0)[0])#rx是所有点的中心线
 ry = int(data.mean(axis=0)[1])
 
 xs = np.linspace(ry, ry - 500, 500)
