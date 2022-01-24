@@ -29,11 +29,13 @@ def readMotionIni():
     f.close()
     return kernelSize,iterations
 
-def saveMotionini(kernelSize=readMotionIni()[0],iterations=readMotionIni()[1]):
+def saveMotionini(kernelSize=-1,iterations=-1):
     f = open(MotioniniURL, "r+")
     inis = json.loads(f.readline())
-    inis['kernelSize'] = kernelSize
-    inis['iterations'] = iterations
+    if kernelSize!=-1:
+        inis['kernelSize'] = kernelSize
+    if iterations!=-1:
+        inis['iterations'] = iterations
 
     f.seek(0)
     f.writelines(json.dumps(inis))
