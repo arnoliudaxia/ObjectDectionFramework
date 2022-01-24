@@ -11,6 +11,7 @@ def runFindPen(mode:int):
             ori,frame=camS.ColorThreshold(keepOrigin=True,showSource=False)
         elif mode==2:
             ori, frame = camS.MotionThreshold(keepOrigin=True)
+
         if frame is None:
             break
         (x, y, w, h) =camS.GetCenterByLongestContour(img=frame,type=ProcessType.Bound)

@@ -44,4 +44,4 @@ def runMathFit(filepath):
 
 
 if __name__ == '__main__':
-    runMathFit(r"..\data.txt")
+    runMathFit(r"../data.txt")

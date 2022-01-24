@@ -1,16 +1,19 @@
 import os
 import sys
+# 将本项目的主文件夹添加到path中（临时）
+sys.path.append(os.path.abspath(os.path.dirname(__file__) + os.path.sep + ".."))
+sys.path.append(os.path.abspath(os.path.dirname(__file__) + os.path.sep + "."))
+
 
 from toolbox.opencvFramework import CamerSystem
 from toolbox.setting import *
+import cv2
 
-sys.path.append(os.path.abspath(".."))
+sys.path.append(os.path.abspath(""))
 from PyQt5.QtWidgets import (QWidget, QToolTip,
-                             QPushButton, QApplication, QDesktopWidget, QMessageBox, QVBoxLayout, QLabel, QHBoxLayout,
-                             QLineEdit, QComboBox, QTextBrowser, QFontDialog, QStyleFactory)
+                             QPushButton, QApplication, QDesktopWidget, QVBoxLayout, QLabel, QLineEdit, QComboBox,
+                             QTextBrowser, QMessageBox)
 from PyQt5.QtGui import QFont
-from QCandyUi import CandyWindow
-from QCandyUi.CandyWindow import colorful
 from ColorCailbrate import runColorConfigure
 from MotionCailbrate import runMotionCailbrate
 from findPen import runFindPen
@@ -27,19 +30,24 @@ def centerWindow(window: QWidget):
     qr.moveCenter(cp)
     window.move(qr.topLeft())
 
+
 def tranfertoMenu(MenuName):
     global mainMenu
     global colorMenu
     global motionMenu
+    global matchMenu
     mainMenu.hide()
-    if MenuName=="Main":
+    if MenuName == "Main":
         colorMenu.hide()
         motionMenu.hide()
+        matchMenu.hide()
         mainMenu.show()
-    if MenuName=="Color":
+    if MenuName == "Color":
         colorMenu.show()
-    if MenuName=="Motion":
+    if MenuName == "Motion":
         motionMenu.show()
+    if MenuName=="Match":
+        matchMenu.show()
 
 
 def analyzeData(method: int, fill: QTextBrowser):
@@ -51,10 +59,26 @@ def analyzeData(method: int, fill: QTextBrowser):
     fill.clear()
     fill.append(str(res))
 
-def loadCamera(url:str):
-    url=url.replace('"','')
-    CamerSystem.cameraMainURL=url
+
+def loadCamera(url: str):
+    url = url.replace('"', '')
+    CamerSystem.cameraMainURL = url
     saveCameraIni(url)
+def checkSnip():
+    global matchMenu
+    isExist=True
+    try:
+        img=cv2.imread("obj.jpg")
+        cv2.imshow("图片",img,)
+    except:
+        isExist=False
+
+    if isExist:
+        QMessageBox.information(matchMenu,"Message","截图已完成！")
+    else:
+        QMessageBox.ctitical(matchMenu,"错误","没有找到截图图片，确认本文件同目录下有obj.jpg文件")
+
+
 class MainMenu(QWidget):
 
     def __init__(self):
@@ -67,9 +91,9 @@ class MainMenu(QWidget):
 
         vbox = QVBoxLayout()
 
-        #视频流URL
-        QLabel("视频流地址",self)
-        URLField=QLineEdit()
+        # 视频流URL
+        QLabel("视频流地址", self)
+        URLField = QLineEdit()
         URLField.setText(readCameraIni())
         URLField.textChanged[str].connect(loadCamera)
         vbox.addWidget(URLField)
@@ -77,7 +101,7 @@ class MainMenu(QWidget):
         Colorbtn = QPushButton('颜色识别', self)
         Colorbtn.setObjectName("btnMenu")
         Colorbtn.setToolTip('提取图像中特定颜色区间的部分，适用于颜色鲜明的主题，与背景有较大的区分度')
-        Colorbtn.clicked.connect(lambda x:tranfertoMenu("Color"))
+        Colorbtn.clicked.connect(lambda x: tranfertoMenu("Color"))
         vbox.addWidget(Colorbtn)
         # 运动检测btn
         MotionBtn = QPushButton('运动检测(KNN)', self)
@@ -85,10 +109,10 @@ class MainMenu(QWidget):
         MotionBtn.setToolTip('通过帧与帧之间的差分计算视频中远动的部分（光流法）.\n'
                              '注意目前主流的背景分割器有MOG，KNN和GMG,在此例中使用KNN的效果最好\n'
                              '在不稳定的环境下不建议Record太多数据，反而有反效果')
-        MotionBtn.clicked.connect(lambda x:tranfertoMenu("Motion"))
+        MotionBtn.clicked.connect(lambda x: tranfertoMenu("Motion"))
         vbox.addWidget(MotionBtn)
         # 目标跟踪
-        trackBtn= QPushButton('目标跟踪')
+        trackBtn = QPushButton('目标跟踪')
         trackBtn.setObjectName("btnMenu")
         trackBtn.setToolTip("可以注意到前面的MotionDection已经不是传统意义上的ObjectDection了\n"
                             "它已经使用了前后相关帧做分析，可以归类为目标跟踪算法\n"
@@ -97,8 +121,16 @@ class MainMenu(QWidget):
                             "真正的目标跟踪算法非常重要的一环是目标运动的估计，对图像滤波\n"
                             "最近正要过年，先不研究了，挖个坑先")
 
-
         vbox.addWidget(trackBtn)
+        #模板匹配
+        matchBtn= QPushButton('模板匹配')
+        matchBtn.setObjectName("btnMenu")
+        matchBtn.setToolTip("这种方法其实是最好理解的，就是如果有物体的图片，那么只需要将这个和视频里的每一帧做比对，最像（图片差最小）的就是物体在的地方\n"
+                            "目前这个方法还需要滤波器消除毛刺，需要完善")
+        matchBtn.clicked.connect(lambda x: tranfertoMenu("Match"))
+
+        vbox.addWidget(matchBtn)
+
         self.setLayout(vbox)
 
         self.setGeometry(300, 300, 352, 273)
@@ -155,13 +187,14 @@ class ColorMenu(QWidget):
         vbox.addWidget(AnalyzeBtn)
         vbox.addWidget(QLabel("R:"))
         vbox.addWidget(ResultField)
-        #Return to MainMenu
-        MenuBtn=QPushButton("←")
-        MenuBtn.clicked.connect(lambda:tranfertoMenu("Main"))
+        # Return to MainMenu
+        MenuBtn = QPushButton("←")
+        MenuBtn.clicked.connect(lambda: tranfertoMenu("Main"))
         vbox.addWidget(MenuBtn)
 
-
         self.setLayout(vbox)
+
+
 class MotionMenu(QWidget):
     def __init__(self):
         super().__init__()
@@ -208,13 +241,67 @@ class MotionMenu(QWidget):
 
         self.setLayout(vbox)
 
+class MatchMenu(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.initUI()
+
+    def initUI(self):
+        self.setGeometry(300, 300, 640, 573)
+        QToolTip.setFont(QFont('SansSerif', 10))
+        self.setWindowTitle('TempletMatch')
+        centerWindow(self)
+
+        vbox = QVBoxLayout()
+        vbox.addWidget(QLabel('Snip'))
+        vbox.addWidget(QLabel('在开始之前，先截个物体的图片保存为obj.jpg，尽量只包含物体的最小图片\n'
+                              '我肝不动了就不做截图功能了'))
+        CheckBtn = QPushButton("Check")
+        CheckBtn.setToolTip("点击我可以检查是否完成,正常的话还会显示截图")
+        CheckBtn.clicked.connect(checkSnip)
+        vbox.addWidget(CheckBtn)
+
+        vbox.addWidget(QLabel('RecordData'))
+        vbox.addWidget(QLabel('下面可以选择不同的匹配方法'))
+        Matchcombox = QComboBox()
+        Matchcombox.insertItem(0, "平方差匹配")
+        Matchcombox.insertItem(1, "标准平方差匹配")
+        Matchcombox.insertItem(2, "交叉相关匹配")
+        Matchcombox.insertItem(3, "归一化交叉相关匹配 ")
+        Matchcombox.insertItem(4, "相关系数匹配")
+        Matchcombox.insertItem(5, "归一化相关系数匹配")
+        vbox.addWidget(Matchcombox)
+        vbox.addWidget(QLabel('按Esc键停止记录'))
+        RecordBtn = QPushButton("Record")
+        RecordBtn.clicked.connect(lambda: recordData.runRecordData(3, Matchcombox.currentIndex()))
+        vbox.addWidget(RecordBtn)
+        vbox.addWidget(QLabel('Analyze Data'))
+        vbox.addWidget(QLabel('读取data.txt中存储的数据，利用不同的数学物理方法求得绳长'))
+        combox = QComboBox()
+        combox.insertItem(0, "数学拟合")
+        combox.insertItem(1, "信号处理")
+        combox.setCurrentIndex(1)
+        vbox.addWidget(combox)
+        ResultField = QTextBrowser()
+        AnalyzeBtn = QPushButton("Analyze")
+        AnalyzeBtn.clicked.connect(lambda: analyzeData(combox.currentIndex() + 1, ResultField))
+        vbox.addWidget(AnalyzeBtn)
+        vbox.addWidget(QLabel("R:"))
+        vbox.addWidget(ResultField)
+        # Return to MainMenu
+        MenuBtn = QPushButton("←")
+        MenuBtn.clicked.connect(lambda: tranfertoMenu("Main"))
+        vbox.addWidget(MenuBtn)
+
+        self.setLayout(vbox)
 app = QApplication(sys.argv)
 css = open("stylesheets/flatwhite.css")
 app.setStyleSheet(css.read())
 css.close()
 mainMenu = MainMenu()
 colorMenu = ColorMenu()
-motionMenu=MotionMenu()
+motionMenu = MotionMenu()
+matchMenu=MatchMenu()
 sys.exit(app.exec_())
 
 # 主题美化：https://zhuanlan.zhihu.com/p/390192953；https://github.com/UN-GCPDS/qt-material;https://www.google.com.hk/search?q=qss样式分享&ie=utf-8&oe=utf-8

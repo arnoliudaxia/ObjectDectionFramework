@@ -14,13 +14,12 @@ class ProcessType(Enum):
     Bound = 2
 
 
-
-
 ###########################################
 class CamerSystem:
     # 网络摄像头URL示例 r"http://192.168.0.120:8080/?action=stream"
     cameraMainURL = r"C:\Users\Arnoliu\PycharmProjects\opecvtry\toolbox\demoVideo.mp4"
     cameraViceURL = 0
+
     def __init__(self, oneOrTwoCamera=1):
         # 根据用户的选择开启几个摄像头
         self.CameraNumber = oneOrTwoCamera
@@ -54,6 +53,7 @@ class CamerSystem:
     # 有固定的背景https://www.yyearth.com/article/18-09/242.html
 
     fgbg = cv2.createBackgroundSubtractorKNN(history=100, detectShadows=False)
+
     def MotionThreshold(self, img=None, keepOrigin=False):
         if img is None:
             frame = self.takeImg()
@@ -62,10 +62,10 @@ class CamerSystem:
         else:
             frame = img
         blured = cv2.GaussianBlur(frame, (3, 3), 0)
-        knersize,iterations=readMotionIni()
+        knersize, iterations = readMotionIni()
 
         fgmask = self.fgbg.apply(blured)
-        fgmask = open_mor(fgmask, knersize,iterations)
+        fgmask = open_mor(fgmask, knersize, iterations)
         if keepOrigin:
             return frame, fgmask
         return fgmask
@@ -96,6 +96,25 @@ class CamerSystem:
             return frame, color_fliter
         return color_fliter
 
+    matchImg = cv2.imread("obj.jpg")
+
+    def GetCenterByMatchTemplet(self, img=None,method=1):
+        if img is None:
+            frame = self.takeImg()
+            if frame is None:
+                return -1,-1
+        else:
+            frame = img
+        match = cv2.matchTemplate(frame, self.matchImg, method=method)
+        min_val, max_val, min_loc, max_loc =cv2.minMaxLoc(match)
+        # If the method is TM_SQDIFF or TM_SQDIFF_NORMED, take minimum
+        if method in [0, 1]:
+            top_left = min_loc
+        else:
+            top_left = max_loc
+        drawPointonImg(frame,top_left[0],top_left[1])
+        return top_left
+
     def GetCenterByLongestContour(self, img, type=ProcessType.CenterCoordinate, debug=False):
         if sys.platform.startswith('win'):
             contours_m, hierarchy_m = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -103,8 +122,8 @@ class CamerSystem:
             h, contours_m, hierarchy_m = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
         areas = [cv2.contourArea(c) for c in contours_m]
-        if len(areas)==0:
-            return (-1,-1,-1,-1)
+        if len(areas) == 0:
+            return (-1, -1, -1, -1)
         longestArea = contours_m[np.nanargmax(areas)]
 
         if type == ProcessType.CenterCoordinate:
@@ -131,7 +150,7 @@ def open_mor(src, kernelsize, iter):
 
 
 # ! Do not use this
-def close_mor(src, kernelsize:int, iter):
+def close_mor(src, kernelsize: int, iter):
     kernel = np.ones((kernelsize, kernelsize), np.uint8)
     opening = cv2.morphologyEx(src, cv2.MORPH_CLOSE, kernel, iterations=iter)
     return opening
@@ -150,7 +169,10 @@ def centerPoint(thimg):
 
 # Draw Tool
 def drawPointonImg(img, px, py):
-    img_rgb = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+    if img.shape[2]!=3:
+        img_rgb = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+    else:
+        img_rgb=img.copy()
     cv2.circle(img_rgb, (px, py), 3, (0, 0, 255))
     cv2.imshow("centerPoint", img_rgb)
 
@@ -161,9 +183,6 @@ def drawCenterPoint(img, imgName):
     cv2.circle(img_rgb, (meanX, meanY), 3, (0, 0, 255))
     cv2.imshow("centerPoint" + str(imgName), img_rgb)
     return meanX, meanY
-
-
-
 
 
 def drawCont(thimg):
