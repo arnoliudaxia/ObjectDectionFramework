@@ -51,7 +51,8 @@ def analyzeData(method: int, fill: QTextBrowser):
     fill.clear()
     fill.append(str(res))
 
-def loadCamera(url):
+def loadCamera(url:str):
+    url=url.replace('"','')
     CamerSystem.cameraMainURL=url
     saveCameraIni(url)
 class MainMenu(QWidget):
@@ -62,10 +63,7 @@ class MainMenu(QWidget):
 
     def initUI(self):
         # 这种静态的方法设置一个用于显示工具提示的字体。我们使用10px滑体字体。
-        QToolTip.setFont(QFont('SansSerif', 10))
-
-        # 创建一个提示，我们称之为settooltip()方法。我们可以使用丰富的文本格式
-        self.setToolTip('This is a <b>QWidget</b> widget')
+        self.setFont(QFont('SansSerif', 10))
 
         vbox = QVBoxLayout()
 
@@ -84,10 +82,23 @@ class MainMenu(QWidget):
         # 运动检测btn
         MotionBtn = QPushButton('运动检测(KNN)', self)
         MotionBtn.setObjectName("btnMenu")
-        MotionBtn.setToolTip('通过帧与帧之间的差分计算视频中远动的部分（光流法）.注意目前主流的背景分割器有MOG，KNN和GMG,在此例中使用KNN的效果最好')
+        MotionBtn.setToolTip('通过帧与帧之间的差分计算视频中远动的部分（光流法）.\n'
+                             '注意目前主流的背景分割器有MOG，KNN和GMG,在此例中使用KNN的效果最好\n'
+                             '在不稳定的环境下不建议Record太多数据，反而有反效果')
         MotionBtn.clicked.connect(lambda x:tranfertoMenu("Motion"))
         vbox.addWidget(MotionBtn)
+        # 目标跟踪
+        trackBtn= QPushButton('目标跟踪')
+        trackBtn.setObjectName("btnMenu")
+        trackBtn.setToolTip("可以注意到前面的MotionDection已经不是传统意义上的ObjectDection了\n"
+                            "它已经使用了前后相关帧做分析，可以归类为目标跟踪算法\n"
+                            "而然它又算不上真正的目标跟踪，从原理来说前后帧作差分（虽然不仅仅是差分）仅仅是为了导出图像的'速度场'\n"
+                            "所以更贴切来说它应该是'动态目标检测'\n"
+                            "真正的目标跟踪算法非常重要的一环是目标运动的估计，对图像滤波\n"
+                            "最近正要过年，先不研究了，挖个坑先")
 
+
+        vbox.addWidget(trackBtn)
         self.setLayout(vbox)
 
         self.setGeometry(300, 300, 352, 273)

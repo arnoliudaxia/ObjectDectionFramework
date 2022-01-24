@@ -17,7 +17,7 @@ def runMotionCailbrate():
 
     while True:
         ori = camer.takeImg()
-        if ori is False:
+        if ori is None:
             break
         frame = cv2.GaussianBlur(ori.copy(), (3, 3), 0)
 
