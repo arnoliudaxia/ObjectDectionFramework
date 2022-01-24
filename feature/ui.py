@@ -2,6 +2,7 @@ import os
 import sys
 
 from toolbox.opencvFramework import CamerSystem
+from toolbox.setting import *
 
 sys.path.append(os.path.abspath(".."))
 from PyQt5.QtWidgets import (QWidget, QToolTip,
@@ -52,6 +53,7 @@ def analyzeData(method: int, fill: QTextBrowser):
 
 def loadCamera(url):
     CamerSystem.cameraMainURL=url
+    saveCameraIni(url)
 class MainMenu(QWidget):
 
     def __init__(self):
@@ -70,6 +72,7 @@ class MainMenu(QWidget):
         #视频流URL
         QLabel("视频流地址",self)
         URLField=QLineEdit()
+        URLField.setText(readCameraIni())
         URLField.textChanged[str].connect(loadCamera)
         vbox.addWidget(URLField)
         # 颜色识别btn

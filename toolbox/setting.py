@@ -2,9 +2,10 @@ import numpy as np
 import json,os
 
 # noinspection SpellCheckingInspection
-ColoriniURL= os.path.dirname(__file__)+r"\color.ini"
+ColoriniURL= os.path.dirname(__file__)+r"\ini\color.ini"
 # noinspection SpellCheckingInspection
-MotioniniURL= os.path.dirname(__file__)+r"\motion.ini"
+MotioniniURL= os.path.dirname(__file__)+r"\ini\motion.ini"
+CamerainiURL=os.path.dirname(__file__)+r"\ini\camera.ini"
 def readColorIni():
     f = open(ColoriniURL, "r")
     inis=json.loads(f.readline())
@@ -36,6 +37,22 @@ def saveMotionini(kernelSize=-1,iterations=-1):
         inis['kernelSize'] = kernelSize
     if iterations!=-1:
         inis['iterations'] = iterations
+
+    f.seek(0)
+    f.writelines(json.dumps(inis))
+    f.close()
+
+def readCameraIni():
+    f = open(CamerainiURL, "r")
+    inis=json.loads(f.readline())
+    url=str(inis['URL'])
+    f.close()
+    return url
+
+def saveCameraIni(url):
+    f = open(CamerainiURL, "r+")
+    inis = json.loads(f.readline())
+    inis["URL"]=url
 
     f.seek(0)
     f.writelines(json.dumps(inis))
