@@ -1,9 +1,7 @@
 import sys
 from enum import Enum
-
 import cv2
 import matplotlib.pyplot as plt
-
 from .setting import *
 
 
@@ -72,10 +70,7 @@ class CamerSystem:
         return fgmask, fgmask_r
 
     def MotionThreshold_l(self):
-        ret, frame = self.cap_l.read()
-        fgmask = CamerSystem.fgbg.apply(frame)
-        # drawCenterPoint(fgmask, "CenterOfMask1")
-        # drawCenterPoint(fgmask_r, "CenterOfMask2")
+
 
         fgmask = open_mor(fgmask, 3, 1)
         fgmask = close_mor(fgmask, 50, 1)
@@ -211,25 +206,12 @@ def drawCenterPoint(img, imgName):
     return meanX, meanY
 
 
-def findRealCont(thimg):
-    pass
-    # if sys.platform.startswith('win'):
-    #     contours_m, hierarchy_m = cv.findContours(fgmask.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-    # else:
-    #     h,contours_m, hierarchy_m = cv.findContours(fgmask.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-    # finalCon = contours[0]
-    # for con in contours:
-    #     if cv2.contourArea(con) < 1000:
-    #         continue
-    #     else:
-    #         finalCon = con
-    # finalCon.resize(finalCon.shape[0], 2)
-    # return finalCon, thimg
+
 
 
 def drawCont(thimg):
     tempimg = thimg.copy()
-    contours = findRealCont(tempimg)
+    contours = cv2.findContours(tempimg)
     img_rgb = cv2.cvtColor(tempimg, cv2.COLOR_GRAY2BGR)
     for point in contours:
         cv2.circle(tempimg, point, 1, (0, 0, 255))
