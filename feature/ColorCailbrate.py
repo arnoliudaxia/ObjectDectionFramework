@@ -39,12 +39,12 @@ def runColorConfigure():
         # 颜色过滤器
         lower_red = np.array([lowB, lowG, lowR])
         upper_red = np.array([highB, highG, highR])
-        frame = cam.ColorThreshold(colorBound=[lower_red, upper_red])
+        ori,frame = cam.ColorThreshold(colorBound=[lower_red, upper_red],keepOrigin=True)
         if frame is None:
             cam.releasCam()
             cam = CamerSystem()
             continue
-        cv2.imshow("ColorFilter", frame)
+        cv2.imshow("ColorFilter", ori&cv2.cvtColor(frame,cv2.COLOR_GRAY2BGR))
 
         k = cv2.waitKey(int(1000 / cam.getFPS() / ((speed + 1) / 100)))
         if k == 27:

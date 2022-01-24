@@ -1,15 +1,19 @@
 from toolbox.opencvFramework import *
+from toolbox.setting import saveMotionini
 
 #mode 1:Color
 def runFindPen(mode:int):
     camS=CamerSystem()
 
     while True:
+        frame=None
         if mode==1:
             ori,frame=camS.ColorThreshold(keepOrigin=True,showSource=False)
-            if frame is None:
-                break
-            (x, y, w, h) =camS.GetCenterByLongestContour(img=frame,type=ProcessType.Bound)
+        elif mode==2:
+            ori, frame = camS.MotionThreshold(keepOrigin=True)
+        if frame is None:
+            break
+        (x, y, w, h) =camS.GetCenterByLongestContour(img=frame,type=ProcessType.Bound)
 
         #MotionMethodTest
 

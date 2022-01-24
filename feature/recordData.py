@@ -7,7 +7,11 @@ def runRecordData(mode:int):
 
     f=open("data.txt","w")
     while True:
-        frame=camS.ColorThreshold(showSource=True)
+        frame=None
+        if mode==1:
+            frame=camS.ColorThreshold(showSource=True)
+        elif mode==2:
+            frame=camS.MotionThreshold()
         if frame is None:
             break
         x, y =camS.GetCenterByLongestContour(img=frame,type=ProcessType.CenterCoordinate,debug=True)

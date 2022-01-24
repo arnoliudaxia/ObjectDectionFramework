@@ -14,25 +14,21 @@ class ProcessType(Enum):
     Bound = 2
 
 
-objectLengthFix = 0
-AngleFix = 0
 
-# 网络摄像头URL示例 r"http://192.168.0.120:8080/?action=stream"
-cameraMainURL = r"C:\Users\Arnoliu\PycharmProjects\opecvtry\testcase\WIN_20220113_17_57_44_Pro.mp4"
-cameraViceURL = 0
 
 ###########################################
 class CamerSystem:
-    fgbg = cv2.createBackgroundSubtractorKNN()
-
+    # 网络摄像头URL示例 r"http://192.168.0.120:8080/?action=stream"
+    cameraMainURL = r"C:\Users\Arnoliu\PycharmProjects\opecvtry\toolbox\demoVideo.mp4"
+    cameraViceURL = 0
     def __init__(self, oneOrTwoCamera=1):
         # 根据用户的选择开启几个摄像头
         self.CameraNumber = oneOrTwoCamera
         assert oneOrTwoCamera != 1 or oneOrTwoCamera != 2
         if oneOrTwoCamera >= 1:
-            self.cap_l = cv2.VideoCapture(cameraMainURL)
+            self.cap_l = cv2.VideoCapture(CamerSystem.cameraMainURL)
         if oneOrTwoCamera == 2:
-            self.cap_r = cv2.VideoCapture(cameraViceURL)
+            self.cap_r = cv2.VideoCapture(CamerSystem.cameraViceURL)
 
     # 读取配置文件
     def loadConfigue(self):
@@ -42,7 +38,7 @@ class CamerSystem:
         ret, frame = self.cap_l.read()
         if not ret:
             print("No Stream or stream stopped!")
-            return False
+            return None
         return frame
 
     def getFPS(self):
@@ -54,66 +50,25 @@ class CamerSystem:
         if self.CameraNumber == 2:
             self.cap_r.release()
 
-    # Read Img with MotionDect
-    def MotionThreshold(self):
-        ret, frame = self.cap_l.read()
-        ret, frame_r = self.cap_r.read()
-        fgmask = CamerSystem.fgbg.apply(frame)
-        fgmask_r = CamerSystem.fgbg.apply(frame_r)
-        # drawCenterPoint(fgmask, "CenterOfMask1")
-        # drawCenterPoint(fgmask_r, "CenterOfMask2")
+    # MotionDect
+    # 有固定的背景https://www.yyearth.com/article/18-09/242.html
 
-        fgmask = open_mor(fgmask, 3, 1)
-        fgmask_r = open_mor(fgmask_r, 3, 1)
-        fgmask = close_mor(fgmask, 50, 1)
-        fgmask_r = close_mor(fgmask_r, 50, 1)
-        return fgmask, fgmask_r
+    fgbg = cv2.createBackgroundSubtractorKNN(history=100, detectShadows=False)
+    def MotionThreshold(self, img=None, keepOrigin=False):
+        if img is None:
+            frame = self.takeImg()
+            if frame is None:
+                return None
+        else:
+            frame = img
+        blured = cv2.GaussianBlur(frame, (3, 3), 0)
+        knersize,iterations=readMotionIni()
 
-    def MotionThreshold_l(self):
-
-
-        fgmask = open_mor(fgmask, 3, 1)
-        fgmask = close_mor(fgmask, 50, 1)
-        return centerPoint(fgmask)
-        # def MotionThreshold_l(self):
-        #     ret, frame = self.cap_l.read()
-        #     fgmask = CamerSystem.fgbg.apply(frame)
-        #     # drawCenterPoint(fgmask, "CenterOfMask1")
-        #     # drawCenterPoint(fgmask_r, "CenterOfMask2")
-
-        #     fgmask = open_mor(fgmask, 3, 1)
-        #     # fgmask = close_mor(fgmask, 50, 1)
-        #     return fgmask
-        # def SimpleCenter(self,img):
-        # if sys.platform.startswith('win'):
-        #     contours_m, hierarchy_m = cv2.findContours(fgmask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        # else:
-        #     h, contours_m, hierarchy_m = cv2.findContours(fgmask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-        # NoSat = True
-        # for c in contours_m:
-        #     # print(cv.contourArea(c))
-        #     if cv2.contourArea(c) < 1000:
-        #         continue
-        #     NoSat = False
-        #     (x, y, w, h) = cv2.boundingRect(c)
-        #     return (x + w) / 2, (y + h) / 2
-        #     cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
-        #     cv2.imshow("kuang", img)
-        #     self.Lx = (x + w) / 2
-        #     self.Ly = (y + h) / 2
-        # if NoSat:
-        #     return self.Lx, self.Ly
-
-    def MotionThreshold_r(self):
-        ret, frame = self.cap_r.read()
-        fgmask = CamerSystem.fgbg.apply(frame)
-        # drawCenterPoint(fgmask, "CenterOfMask1")
-        # drawCenterPoint(fgmask_r, "CenterOfMask2")
-
-        fgmask = open_mor(fgmask, 3, 1)
-        fgmask = close_mor(fgmask, 50, 1)
-        return centerPoint(fgmask)
+        fgmask = self.fgbg.apply(blured)
+        fgmask = open_mor(fgmask, knersize,iterations)
+        if keepOrigin:
+            return frame, fgmask
+        return fgmask
 
     def ColorThreshold(self, img=None, blurKernelSize=5, colorBound=None, showSource=True, keepOrigin=False):
         self.loadConfigue()
@@ -148,6 +103,8 @@ class CamerSystem:
             h, contours_m, hierarchy_m = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
         areas = [cv2.contourArea(c) for c in contours_m]
+        if len(areas)==0:
+            return (-1,-1,-1,-1)
         longestArea = contours_m[np.nanargmax(areas)]
 
         if type == ProcessType.CenterCoordinate:
@@ -174,7 +131,7 @@ def open_mor(src, kernelsize, iter):
 
 
 # ! Do not use this
-def close_mor(src, kernelsize, iter):
+def close_mor(src, kernelsize:int, iter):
     kernel = np.ones((kernelsize, kernelsize), np.uint8)
     opening = cv2.morphologyEx(src, cv2.MORPH_CLOSE, kernel, iterations=iter)
     return opening
