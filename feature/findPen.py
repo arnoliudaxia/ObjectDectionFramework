@@ -5,11 +5,16 @@ def runFindPen(mode:int):
     camS=CamerSystem()
 
     while True:
-        ori,frame=camS.ColorThreshold(keepOrigin=True,showSource=False)
-        if frame is None:
-            break
-        (x, y, w, h) =camS.GetCenterByLongestContour(img=frame,type=ProcessType.Bound)
+        if mode==1:
+            ori,frame=camS.ColorThreshold(keepOrigin=True,showSource=False)
+            if frame is None:
+                break
+            (x, y, w, h) =camS.GetCenterByLongestContour(img=frame,type=ProcessType.Bound)
 
+        #MotionMethodTest
+
+
+        ###
         cv2.rectangle(ori, (x, y), (x + w, y + h), (0,0,255), 2)
         X, Y = round((2 * x + w) / 2), round((2 * y + h) / 2)
         #绘制中心十字线

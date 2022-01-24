@@ -1,20 +1,15 @@
-import cv2 as cv
-import sys
-import numpy as np
-from task.myopencvTool import *
-
-input("Press Enter To Start")
+from toolbox.opencvFramework import *
+#有固定的背景https://www.yyearth.com/article/18-09/242.html
 
 camer=CamerSystem()
 cap = camer.cap_l
 
-kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (2, 2))
-color_m = (0, 0, 255)
+#尝试
 
 # fgbg = cv.bgsegm.createBackgroundSubtractorMOG()
 # fgbg=cv.createBackgroundSubtractorMOG2(detectShadows=False,varThreshold=20)
-fgbg =cv.createBackgroundSubtractorKNN()
-
+# fgbg =cv2.createBackgroundSubtractorKNN()
+fgbg=cv2.createBackgroundSubtractorMOG2(history=,varThreshold=16,detectShadows=False)
 
 Lx=0
 Ly=0
@@ -22,11 +17,8 @@ Lw=0
 Lh=0
 while True:
     ret, frame = cap.read()
-    # if not ret:
-    #     break
-    # # frame = cv.resize(frame, (500, 500), interpolation=cv.INTER_CUBIC)
-    # frame_motion = frame.copy()
-    # # cv.imshow("source", frame_motion)
+    if not ret:
+        break
 
     fgmask = fgbg.apply(frame)
     # # cv.imshow("MaskMOG",fgmask )

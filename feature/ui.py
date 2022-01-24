@@ -49,18 +49,23 @@ class MainMenu(QWidget):
         # 创建一个提示，我们称之为settooltip()方法。我们可以使用丰富的文本格式
         self.setToolTip('This is a <b>QWidget</b> widget')
 
+        vbox=QVBoxLayout()
+
         # 颜色识别btn
         btn = QPushButton('颜色识别', self)
+        btn.setObjectName("btnMenu")
         btn.setToolTip('提取图像中特定颜色区间的部分，适用于颜色鲜明的主题，与背景有较大的区分度')
         btn.clicked.connect(tranfertoColor)
-        btn.resize(btn.sizeHint())
+        vbox.addWidget(btn)
+        # btn.resize(btn.sizeHint())
+        self.setLayout(vbox)
 
         self.setGeometry(300, 300, 300, 200)
         self.setWindowTitle('ObjectDetectionDemo')
         centerWindow(self)
 
         self.show()
-@colorful('blueGreen','ColorFilter')
+# @colorful('blueGreen','ColorFilter')
 class ColorMenu(QWidget):
     def __init__(self):
         super().__init__()
@@ -111,6 +116,11 @@ class ColorMenu(QWidget):
         self.setLayout(vbox)
 
 app = QApplication(sys.argv)
+css=open("stylesheets/flatwhite.css")
+app.setStyleSheet(css.read())
+css.close()
 mainMenu = MainMenu()
 colorMenu=ColorMenu()
 sys.exit(app.exec_())
+
+#主题美化：https://zhuanlan.zhihu.com/p/390192953；https://github.com/UN-GCPDS/qt-material;https://www.google.com.hk/search?q=qss样式分享&ie=utf-8&oe=utf-8

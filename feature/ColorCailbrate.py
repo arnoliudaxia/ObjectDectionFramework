@@ -1,14 +1,17 @@
 # 此程序是调整Color Mask 的参数的
 from toolbox.opencvFramework import *
+#https://github.com/1zlab/1ZLAB_Color_Block_Finder
 
 def runColorConfigure():
     cam = CamerSystem()
     low, high = readColorIni()
     icol = low.tolist() + high.tolist()
-    #region 创建窗体
+
+    # region 创建窗体
     # 创建空回调函数
     def nothing(*arg):
         pass
+
     cv2.namedWindow('ColorFilter', cv2.WINDOW_NORMAL)
     cv2.createTrackbar("speed(%)", "ColorFilter", 100, 200, nothing)
     # Lower range colour sliders.
@@ -19,7 +22,10 @@ def runColorConfigure():
     cv2.createTrackbar('highR', 'ColorFilter', icol[5], 255, nothing)
     cv2.createTrackbar('highG', 'ColorFilter', icol[4], 255, nothing)
     cv2.createTrackbar('highB', 'ColorFilter', icol[3], 255, nothing)
-    #endregion
+
+    cv2.createTrackbar("Save", 'ColorFilter', 0, 1, nothing)
+
+    # endregion
     while True:
 
         lowR = cv2.getTrackbarPos('lowR', 'ColorFilter')
@@ -30,23 +36,24 @@ def runColorConfigure():
         highB = cv2.getTrackbarPos('highB', 'ColorFilter')
         speed = cv2.getTrackbarPos('speed(%)', 'ColorFilter')
 
-
         # 颜色过滤器
         lower_red = np.array([lowB, lowG, lowR])
         upper_red = np.array([highB, highG, highR])
-        frame=cam.ColorThreshold(colorBound=[lower_red,upper_red])
+        frame = cam.ColorThreshold(colorBound=[lower_red, upper_red])
         if frame is None:
             cam.releasCam()
-            cam=CamerSystem()
+            cam = CamerSystem()
             continue
         cv2.imshow("ColorFilter", frame)
 
-        k = cv2.waitKey(int(1000 / cam.getFPS() / ((speed+1)/100)))
+        k = cv2.waitKey(int(1000 / cam.getFPS() / ((speed + 1) / 100)))
         if k == 27:
             break
-        if k == ord("s"):
-            saveColorini([[lowB, lowG, lowR],[highB, highG, highR]])
+        if k == ord("s") or cv2.getTrackbarPos("Save",'ColorFilter')==1:
+            saveColorini([[lowB, lowG, lowR], [highB, highG, highR]])
             break
 
     cam.releasCam()
     cv2.destroyAllWindows()
+if __name__ == "__main__":
+    runColorConfigure()
