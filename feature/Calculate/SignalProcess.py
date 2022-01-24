@@ -20,5 +20,5 @@ def runSignalProcess(filepath):
     plt.show()
     peaks=sig.find_peaks(xs)
     average_time=stat.linregress(np.arange(len(peaks[0])),times[peaks[0]]).slope
-    print(f"L is {Time2Length(average_time)} m.")
+    print(f"average time is {average_time}")
     return f"{Time2Length(average_time)} m"

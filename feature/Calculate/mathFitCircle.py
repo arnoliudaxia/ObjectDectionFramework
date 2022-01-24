@@ -28,7 +28,7 @@ def runMathFit(filepath):
     plt.plot(xs, y)
     plt.show()
 
-    ry = opt.minimize(lambda x: np.var(np.sqrt(np.sum((data - (rx, x[0])) ** 2, axis=1))), np.array([ry])).x[0]
+    ry = opt.minimize(lambda x: np.nanstd(np.sqrt(np.sum((data - (rx, x[0])) ** 2, axis=1))), np.array([ry])).x[0]
     # ry = round(xs[np.argmin(y)])
     ry=round(ry)
     r = round(np.mean(np.sqrt(np.sum((data - (rx, ry)) ** 2, axis=1))))
@@ -39,6 +39,7 @@ def runMathFit(filepath):
     cv2.line(trackImg, (rx, 0), (rx, 470), (0, 0, 255), 2)
     cv2.imshow("Regression", trackImg)
     cv2.waitKey(5000)
+    cv2.destroyAllWindows()
     return f"{r} px"
 
 
