@@ -35,9 +35,68 @@ python ui.py
 ![img.png](docs/img3.png)
 
 每一步都有比较详细的解释，基本流程就是先调整好过滤器的参数，然后记录数据，最后分析数据。
+
 #build
 我尝试了pyinstaller和nuitka，试了好久好久，都失败了。环境包太多，依赖关系太过于复杂，打包程序运行时还对包的版本有自己的要求。我实在整不动了。
+
+#目录结构
+
+```
+│  ColorCailbrate.py
+│  data.txt
+│  findPen.py
+│  MotionCailbrate.py
+│  obj.jpg
+│  README.md
+│  recordData.py
+│  style.qss
+│  ui.py
+│
+├─Calculate #处理数据的代码
+│  │  mathFitCircle.py #使用离散轨迹拟合摆动圆
+│  │  SignalProcess.py #使用信号处理方法拟合信号周期
+│
+├─docs # README中的图片
+│      img.png
+│      img2.png
+│      img3.png
+│
+├─ref #一些个人参考代码，demo不依赖于这些，可以删除
+│  │  drawconvexhull.py
+│  │  opencvReadVideo.py
+│  │  videoLightMotion.py
+│  │
+│  └─socket
+│          socketClient.py
+│          socketServer.py
+│
+├─stylesheets #demo程序控件CSS样式表
+│  │  flatwhite.css
+│  │  lightblue.css
+│  │  psblack.css
+│  │
+│  ├─flatwhite
+│  │      ...
+│  ├─lightblue
+│  │      ...
+│  └─psblack
+│  │      ...
+├─toolbox #该文件夹下是demo的后端框架
+│  │  demoVideo.mp4 #示例程序
+│  │  mathUtility.py #包含了一些用到的数学和物理函数
+│  │  opencvFramework.py #核心代码，几乎抽象了一个软openmv
+│  │  setting.py #设置系统接口
+│  │
+│  ├─ini #包含了配置文件，记录各种参数数值
+│  │      camera.ini #摄像头相关配置
+│  │      color.ini #颜色滤镜相关配置
+│  │      motion.ini #光流法相关配置
+└──────────────────────────────────
+
+```
+
 # 参考资料、文献
 累计起来已经有几百条了，不列了
+
 #开源许可申明
 代码部分借鉴自官方文档，本项目开源协议为MIT
