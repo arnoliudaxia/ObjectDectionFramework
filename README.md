@@ -42,16 +42,6 @@ python ui.py
 # 目录结构
 
 ```
-│  ColorCailbrate.py
-│  data.txt
-│  findPen.py
-│  MotionCailbrate.py
-│  obj.jpg
-│  README.md
-│  recordData.py
-│  style.qss
-│  ui.py
-│
 ├─Calculate #处理数据的代码
 │  │  mathFitCircle.py #使用离散轨迹拟合摆动圆
 │  │  SignalProcess.py #使用信号处理方法拟合信号周期
@@ -91,6 +81,16 @@ python ui.py
 │  │      camera.ini #摄像头相关配置
 │  │      color.ini #颜色滤镜相关配置
 │  │      motion.ini #光流法相关配置
+│  ColorCailbrate.py #基于色彩空间的滤波器
+│  data.txt #单摆数据
+│  findPen.py #使用滤波器过滤物体的执行器
+│  MotionCailbrate.py #调试光流法参数
+│  obj.jpg #用于模板匹配的物体图像
+│  README.md
+│  recordData.py #记录物体位置数据的执行器
+│  style.qss #CSS样式表
+│  ui.py #GUI
+│
 └──────────────────────────────────
 
 ```

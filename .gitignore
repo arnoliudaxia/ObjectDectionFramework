@@ -9,3 +9,5 @@
 task/
 
 __pycache__/
+
+.vscode/
