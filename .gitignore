@@ -7,3 +7,5 @@
 .idea/
 
 task/
+
+__pycache__/
