@@ -36,6 +36,10 @@ python ui.py
 
 每一步都有比较详细的解释，基本流程就是先调整好过滤器的参数，然后记录数据，最后分析数据。
 
+# 演示
+https://www.bilibili.com/video/BV1au41117rX/
+<iframe src="//player.bilibili.com/player.html?aid=508396244&bvid=BV1au41117rX&cid=493190533&page=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>
+
 # build
 我尝试了pyinstaller和nuitka，试了好久好久，都失败了。环境包太多，依赖关系太过于复杂，打包程序运行时还对包的版本有自己的要求。我实在整不动了。
 
