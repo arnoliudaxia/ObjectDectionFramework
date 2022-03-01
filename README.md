@@ -11,6 +11,8 @@
 ```bash
 git clone https://github.com/arnoliudaxia/ObjectDectionFramework.git
 ```
+> 注意master分支比较适合Windows平台，在Linux kernel 的系统上使用Linux分支更合适
+
 不管使用什么python环境，确保python版本在3.4以上，环境要求是numpy,opencv3,matplotlib,scipy,pyQt5
 
 所有功能都已经集成在ui.py中，运行demo只需要
