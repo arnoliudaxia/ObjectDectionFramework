@@ -1,3 +1,4 @@
+# -*- coding: utf-8
 import sys
 from enum import Enum
 import cv2
@@ -17,7 +18,7 @@ class ProcessType(Enum):
 ###########################################
 class CamerSystem:
     # 网络摄像头URL示例 r"http://192.168.0.120:8080/?action=stream"
-    cameraMainURL = r"C:\Users\Arnoliu\PycharmProjects\opecvtry\toolbox\demoVideo.mp4"
+    cameraMainURL = 0
     cameraViceURL = 0
 
     def __init__(self, oneOrTwoCamera=1):
@@ -119,7 +120,7 @@ class CamerSystem:
         if sys.platform.startswith('win'):
             contours_m, hierarchy_m = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         else:
-            h, contours_m, hierarchy_m = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            h,contours_m, hierarchy_m = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
         areas = [cv2.contourArea(c) for c in contours_m]
         if len(areas) == 0:
@@ -150,7 +151,7 @@ def open_mor(src, kernelsize, iter):
 
 
 # ! Do not use this
-def close_mor(src, kernelsize: int, iter):
+def close_mor(src, kernelsize, iter):
     kernel = np.ones((kernelsize, kernelsize), np.uint8)
     opening = cv2.morphologyEx(src, cv2.MORPH_CLOSE, kernel, iterations=iter)
     return opening

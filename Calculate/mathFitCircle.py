@@ -16,7 +16,7 @@ def runMathFit(filepath):
 
     trackImg = cv2.cvtColor(np.zeros((480, 640), dtype=np.uint8), cv2.COLOR_GRAY2BGR)
     for point in data.astype(np.int):
-        cv2.circle(trackImg, point, 1, (255, 255, 255))
+        pass#cv2.circle(trackImg, point, 1, (255, 255, 255))
     cv2.imshow("track", trackImg)
 
 
@@ -44,4 +44,4 @@ def runMathFit(filepath):
 
 
 if __name__ == '__main__':
-    runMathFit(r"../data.txt")
+    runMathFit(r"..\data.txt")

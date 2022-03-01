@@ -2,10 +2,10 @@ import numpy as np
 import json,os
 
 # noinspection SpellCheckingInspection
-ColoriniURL= os.path.dirname(__file__)+r"\ini\color.ini"
+ColoriniURL= os.path.dirname(__file__)+r"/ini/color.ini"
 # noinspection SpellCheckingInspection
-MotioniniURL= os.path.dirname(__file__)+r"\ini\motion.ini"
-CamerainiURL=os.path.dirname(__file__)+r"\ini\camera.ini"
+MotioniniURL= os.path.dirname(__file__)+r"/ini/motion.ini"
+CamerainiURL=os.path.dirname(__file__)+r"/ini/camera.ini"
 def readColorIni():
     f = open(ColoriniURL, "r")
     inis=json.loads(f.readline())

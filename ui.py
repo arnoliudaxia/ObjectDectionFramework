@@ -1,3 +1,4 @@
+# -*- coding: utf-8
 import os
 import sys
 # 将本项目的主文件夹添加到path中（临时）
@@ -21,7 +22,7 @@ import recordData
 from Calculate import mathFitCircle, SignalProcess
 
 
-def centerWindow(window: QWidget):
+def centerWindow(window):
     # 获得窗口
     qr = window.frameGeometry()
     # 获得屏幕中心点
@@ -50,17 +51,17 @@ def tranfertoMenu(MenuName):
         matchMenu.show()
 
 
-def analyzeData(method: int, fill: QTextBrowser):
+def analyzeData(method, fill):
     res = -1
     if method == 1:
-        res = mathFitCircle.runMathFit(os.path.abspath('') + r"\data.txt")
+        res = mathFitCircle.runMathFit(os.path.abspath('') + r"/data.txt")
     if method == 2:
-        res = SignalProcess.runSignalProcess(os.path.abspath('') + r"\data.txt")
+        res = SignalProcess.runSignalProcess(os.path.abspath('') + r"/data.txt")
     fill.clear()
     fill.append(str(res))
 
 
-def loadCamera(url: str):
+def loadCamera(url):
     url = url.replace('"', '')
     CamerSystem.cameraMainURL = url
     saveCameraIni(url)

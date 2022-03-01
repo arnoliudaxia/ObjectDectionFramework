@@ -1,3 +1,4 @@
+# -*- coding: utf-8
 # 此程序是调整Color Mask 的参数的
 from toolbox.opencvFramework import *
 #https://github.com/1zlab/1ZLAB_Color_Block_Finder
